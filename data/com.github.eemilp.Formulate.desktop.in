@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=formulate
+Exec=formulate
+Icon=com.github.eemilp.Formulate
+Terminal=false
+Type=Application
+Categories=Utility;
+Keywords=GTK;
+StartupNotify=true

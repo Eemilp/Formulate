@@ -1,0 +1,51 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $Cell : Adw.Bin {
+  margin-start: 10;
+  margin-end: 10;
+  Adw.Clamp clamp { //Why on earth is the clamp class final???
+    Frame frame {
+      styles ["frame"]
+      CenterBox cell_centerbox {
+        // styles: ["border"];
+        [start]
+        Button remove_cell {
+          icon-name: "user-trash-symbolic";
+          valign: start;
+          margin-start: 5;
+          margin-top: 5;
+          margin-end: 5;
+          margin-bottom: 5;
+        }
+
+        // Center widget is put in code
+
+        [end]
+        Adw.SplitButton add_cell {
+          valign: end;
+          icon-name: "list-add-symbolic";
+          margin-start: 5;
+          margin-top: 5;
+          margin-end: 5;
+          margin-bottom: 5;
+          menu-model: add_cell_menu;
+        }
+      }
+    }
+  }
+}
+
+menu add_cell_menu {
+  section{
+    item {
+      label: "Math";
+      action: "add.math";
+    }
+    item {
+      label: "Text";
+      action: "add.text";
+    }
+  }
+}
+

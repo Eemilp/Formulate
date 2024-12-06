@@ -1,0 +1,84 @@
+{
+    "id" : "com.github.eemilp.Formulate",
+    "runtime" : "org.gnome.Platform",
+    "runtime-version" : "46",
+    "sdk" : "org.gnome.Sdk",
+    "command" : "formulate",
+    "finish-args" : [
+        "--share=network",
+        "--share=ipc",
+        "--socket=fallback-x11",
+        "--device=dri",
+        "--socket=wayland"
+    ],
+    "cleanup" : [
+        "/include",
+        "/lib/pkgconfig",
+        "/man",
+        "/share/doc",
+        "/share/gtk-doc",
+        "/share/man",
+        "/share/pkgconfig"
+    ],
+    "modules" : [
+   	{
+            "name": "python3-lark",
+            "buildsystem": "simple",
+            "build-commands": [
+                "pip3 install --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} \"lark==1.1.5\" --no-build-isolation"
+            ],
+            "sources": [
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/a2/25/8e16de418fc83bb00dabaf8c7110bc45a90bf5481a70aa5f1668fcea73bc/lark-1.1.5.tar.gz",
+                    "sha256": "4b534eae1f9af5b4ea000bea95776350befe1981658eea3820a01c37e504bb4d"
+                }
+            ]
+        },
+        {
+            "name": "intltool",
+            "cleanup": [
+                "*"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-0.51.0.tar.gz",
+                    "sha256": "67c74d94196b153b774ab9f89b2fa6c6ba79352407037c8c14d5aeb334e959cd",
+                    "x-checker-data": {
+                        "type": "anitya",
+                        "project-id": 1385,
+                        "stable-only": true,
+                        "url-template": "https://launchpad.net/intltool/trunk/$version/+download/intltool-$version.tar.gz"
+                    }
+                }
+            ]
+        },
+        {
+            "name" : "libqalculate",
+            "buildsystem" : "autotools",
+            "sources" : [
+            	{
+            	    "type" : "archive",
+        	    "url" : "https://github.com/Qalculate/libqalculate/releases/download/v5.2.0/libqalculate-5.2.0.tar.gz",
+        	    "sha256" : "20be13a39aea7f0371af789539cb285892f2e15d8240f29f9f380984e3446830"
+            	}
+            ]
+        },
+        {
+            "name" : "formulate",
+            "builddir" : true,
+            "buildsystem" : "meson",
+            "cleanup" : [
+        	"*.la",
+           	"*.a"
+            ],
+            "sources" : [
+                {
+                    "type" : "git",
+                    "url" : "https://github.com/Eemilp/Formulate.git"
+                }
+            ]
+        }
+    ]
+}

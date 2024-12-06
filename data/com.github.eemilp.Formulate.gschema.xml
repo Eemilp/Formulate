@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="formulate">
+	<schema id="com.github.eemilp.Formulate" path="/com/github/eemilp/Formulate/">
+	</schema>
+</schemalist>

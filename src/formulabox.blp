@@ -1,0 +1,18 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $FormulaBox : Gtk.Box {
+      orientation: horizontal;
+      valign: center;
+      halign: center;
+      hexpand: true;
+      spacing: 5;
+
+      Viewport editor_viewport {
+      }
+
+      Label editor_text {
+        label: "";
+        use-markup: true;
+      }
+}

@@ -1,0 +1,37 @@
+using Gtk 4.0;
+
+ShortcutsWindow help_overlay {
+  modal: true;
+
+  ShortcutsSection {
+    section-name: "shortcuts";
+    max-height: 10;
+
+    ShortcutsGroup {
+      title: C_("shortcut window", "General");
+
+      ShortcutsShortcut {
+        title: C_("shortcut window", "Show Shortcuts");
+        action-name: "win.show-help-overlay";
+      }
+
+      ShortcutsShortcut {
+        title: C_("shortcut window", "Quit");
+        action-name: "app.quit";
+      }
+    }
+    ShortcutsGroup {
+      title: C_("shortcut window", "Saving and loading");
+
+      ShortcutsShortcut {
+        title: C_("shortcut window", "Open file");
+        action-name: "win.open";
+      }
+
+      ShortcutsShortcut {
+        title: C_("shortcut window", "Save file");
+        action-name: "win.save-as";
+      }
+    }
+  }
+}

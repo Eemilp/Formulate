@@ -1,0 +1,6 @@
+data/com.github.eemilp.Formulate.desktop.in
+data/com.github.eemilp.Formulate.metainfo.xml.in
+data/com.github.eemilp.Formulate.gschema.xml
+src/main.py
+src/window.py
+src/window.ui

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/com/github/eemilp/Formulate">
+    <file preprocess="xml-stripblanks">window.ui</file>
+    <file preprocess="xml-stripblanks">formulabox.ui</file>
+    <file preprocess="xml-stripblanks">document.ui</file>
+    <file preprocess="xml-stripblanks">cell.ui</file>
+    <file preprocess="xml-stripblanks">textbox.ui</file>
+    <file preprocess="xml-stripblanks">gtk/help-overlay.ui</file>
+    <file alias="style-dark.css">style-dark.css</file>
+    <file alias="style.css">style.css</file>
+  </gresource>
+</gresources>
+
