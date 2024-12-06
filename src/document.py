@@ -147,10 +147,15 @@ class Document(Gtk.Box):
         cell_data = json.loads(decoded)
 
         # remove current document and add new document
-        for c in self.cells:
+        for c in [c for c in self.cells]: # Wow this is stupid
             self.cells.remove(c)
         for d in cell_data:
             self.append_cell(d['type'], d['content'], d['tbc'])
+
+        #Juggling deletability so that only cell cannot be deleted
+        if len([0 for c in self.cells]) == 1:
+            for c in self.cells:
+                c.set_deletability(False)
 
         self.run_calculation()
 
@@ -178,3 +183,4 @@ class Document(Gtk.Box):
             display_name = file.get_basename()
         if not res:
             print(f"Unable to save {display_name}")
+
