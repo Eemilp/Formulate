@@ -73,13 +73,13 @@ class Document(Gtk.Box):
         cell_editor.grab_focus()
 
     # Ugly but needed for adding the initial cell
-    def append_cell(self, cell_type = CellType.TEXT, cell_data = None, tbc = False):
+    def append_cell(self, cell_type = CellType.TEXT, cell_data = None):
         #Juggling deletability so that only cell cannot be deleted
         if len([0 for c in self.cells]) == 1:
             for c in self.cells:
                 c.set_deletability(True)
 
-        new_cell = Cell(cell_type, cell_data, tbc)
+        new_cell = Cell(cell_type, cell_data)
         cell_editor = new_cell.get_editor()
 
         # connect the calculate signal to run the notebook
@@ -96,22 +96,22 @@ class Document(Gtk.Box):
         # get all expressions in the document
         expressions = [c.get_expression() for c in self.cells]
 
-        # TODO this whole system kind of breaks ans from working properly
-
-        # Empty rows get discarded by qalc -> empty rows replaced by zero
-        expressions = ['0' if e == '' else e for e in expressions]
+        # Empty rows get discarded by qalc -> empty rows replaced by zero and None discarded
+        expressions = ['0' if e == '' else e for e in expressions if e is not None]
 
         # calculate the results
         result_string = self.qalc.qalculate('\n'.join(expressions))
         results = result_string.split('\n') #! note last element empty
 
+        calculation_cells = [c for c in self.cells if c.cell_type is CellType.COMPUTATION]
+
         # update labels
-        for (c, r) in zip(self.cells, results):
+        for (c, r) in zip(calculation_cells, results):
             c.update_result(r)
 
     def save_file(self, file):
         # TODO version information
-        data = [dict(type=c.cell_type, content=c.get_cell_content(), tbc=c.to_be_calculated ) for c in self.cells]
+        data = [dict(type=c.cell_type, content=c.get_cell_content()) for c in self.cells]
         data_str = json.dumps(data)
         bytes = GLib.Bytes.new(data_str.encode('utf-8'))
 
@@ -150,7 +150,7 @@ class Document(Gtk.Box):
         for c in [c for c in self.cells]: # Wow this is stupid
             self.cells.remove(c)
         for d in cell_data:
-            self.append_cell(d['type'], d['content'], d['tbc'])
+            self.append_cell(d['type'], d['content'])
 
         #Juggling deletability so that only cell cannot be deleted
         if len([0 for c in self.cells]) == 1:

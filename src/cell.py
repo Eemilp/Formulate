@@ -29,6 +29,7 @@ from enum import IntEnum
 class CellType(IntEnum):
     MATH = 1
     TEXT = 2
+    COMPUTATION = 3
 
 @Gtk.Template(resource_path='/com/github/eemilp/Formulate/cell.ui')
 class Cell(Adw.Bin):
@@ -44,20 +45,17 @@ class Cell(Adw.Bin):
     add_cell_button = Gtk.Template.Child("add_cell")
 
     cell_type = None
-    to_be_calculated = False
 
-    def __init__(self, cell_type, data=None, tbc = False, **kwargs):
+    def __init__(self, cell_type, data=None, **kwargs):
         super().__init__(**kwargs)
         self.cell_type = cell_type
-        if cell_type == CellType.MATH:
+        if cell_type == CellType.MATH or cell_type == CellType.COMPUTATION:
             # add one formulabox for now
             formulabox = FormulaBox(data)
             self.cell_centerbox.set_center_widget(formulabox)
 
             # hook up the signal for calculation
             formulabox.viewport.get_child().connect("calculate", self.run_calculation)
-
-            self.to_be_calculated = tbc
 
         elif cell_type == CellType.TEXT:
             # text editor implemented in an TextView
@@ -93,16 +91,16 @@ class Cell(Adw.Bin):
 
     # Functions to abstract away getting and updating math expressions
     def get_expression(self):
-        if self.cell_type == CellType.MATH and self.to_be_calculated:
+        if self.cell_type == CellType.COMPUTATION:
             return self.cell_centerbox.get_center_widget().get_expression()
         else:
-            return "0"
+            return None
     def update_result(self, result):
-        if self.to_be_calculated == True:
+        if self.cell_type == CellType.COMPUTATION:
             self.cell_centerbox.get_center_widget().update_label(result)
 
     def run_calculation(self, _ = None):
-        self.to_be_calculated = True
+        self.cell_type = CellType.COMPUTATION
         self.emit("calculate")
 
     def get_editor(self):
