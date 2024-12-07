@@ -111,7 +111,8 @@ class Document(Gtk.Box):
 
     def save_file(self, file):
         # TODO version information
-        data = [dict(type=c.cell_type, content=c.get_cell_content()) for c in self.cells]
+        cell_data = [dict(type=c.cell_type, content=c.get_cell_content()) for c in self.cells]
+        data = dict(version="0.1.0", cells=cell_data)
         data_str = json.dumps(data)
         bytes = GLib.Bytes.new(data_str.encode('utf-8'))
 
@@ -144,7 +145,11 @@ class Document(Gtk.Box):
             print(f"Unable to open {path}: {contents[1]}")
 
         decoded = contents[1].decode('utf-8')
-        cell_data = json.loads(decoded)
+        data = json.loads(decoded)
+
+        # TODO check version
+
+        cell_data = data['cells']
 
         # remove current document and add new document
         for c in [c for c in self.cells]: # Wow this is stupid

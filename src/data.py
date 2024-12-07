@@ -15,10 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Plots.  If not, see <https://www.gnu.org/licenses/>.
 
-# from jinja2 import Environment, PackageLoader
-
-# jinja_env = Environment(loader=PackageLoader('qalcpad', 'shaders'))
-
 GREEK_LETTERS = {
     'Alpha': 'Α',
     'Beta': 'Β',
