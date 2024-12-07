@@ -166,10 +166,22 @@ class Document(Gtk.Box):
         self.run_calculation()
 
 
-    def export_pdf(self, file):
-        data = [dict(type=c.cell_type, content=c.get_cell_content() ) for c in self.cells]
-        data_str = json.dumps(data)
-        bytes = GLib.Bytes.new(data_str.encode('utf-8')) #TODO convert to pdf
+    def export_file(self, file, type = 'md'):
+
+        def get_md(c):
+            if c.cell_type == CellType.MATH:
+                return '$$\n' + c.get_cell_content() + '\n$$'
+            elif c.cell_type == CellType.COMPUTATION:
+                return '$$\n' + c.get_cell_content() + ' ' + c.get_result() + '\n$$'
+            else:
+                return c.get_cell_content()
+
+        lines = [get_md(c) for c in self.cells]
+        data_str = '\n\n'.join(lines)
+
+        # TODO pdf conversion
+
+        bytes = GLib.Bytes.new(data_str.encode('utf-8'))
 
         # Start the asynchronous operation to save the data into the file
         file.replace_contents_bytes_async(bytes,
@@ -177,9 +189,9 @@ class Document(Gtk.Box):
                                           False,
                                           Gio.FileCreateFlags.NONE,
                                           None,
-                                          self.save_file_complete)
+                                          self.export_complete)
 
-    def export_pdf_complete(self, file, result):
+    def export_complete(self, file, result):
         res = file.replace_contents_finish(result)
         info = file.query_info("standard::display-name",
                            Gio.FileQueryInfoFlags.NONE)

@@ -45,9 +45,9 @@ class FormulateWindow(Adw.ApplicationWindow):
         save_action.connect("activate", self.save_file_dialog)
         self.add_action(save_action)
 
-        # export_action = Gio.SimpleAction(name="export-pdf")
-        # export_action.connect("activate", self.export_pdf_dialog)
-        # self.add_action(export_action)
+        export_action = Gio.SimpleAction(name="export")
+        export_action.connect("activate", self.export_dialog)
+        self.add_action(export_action)
 
 
     def open_file_dialog(self, action, _):
@@ -76,12 +76,16 @@ class FormulateWindow(Adw.ApplicationWindow):
             self.scrolled_window.get_child().get_child().save_file(file)
 
 
-    def export_pdf_dialog(self, action, _):
+    def export_dialog(self, action, _):
+        filter = Gtk.FileFilter()
+        filter.add_suffix('md')
         native = Gtk.FileDialog()
+        native.set_default_filter(filter)
+        native.set_initial_name('Document.md')
         native.save(self, None, self.on_export_response)
 
     def on_export_response(self, dialog, result):
         file = dialog.save_finish(result)
         if file is not None:
-            self.scrolled_window.get_child().get_child().save_file(file)
+            self.scrolled_window.get_child().get_child().export_file(file)
 

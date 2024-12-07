@@ -98,6 +98,11 @@ class Cell(Adw.Bin):
     def update_result(self, result):
         if self.cell_type == CellType.COMPUTATION:
             self.cell_centerbox.get_center_widget().update_label(result)
+    def get_result(self):
+        if self.cell_type == CellType.COMPUTATION:
+            return self.cell_centerbox.get_center_widget().get_label()
+        else:
+            return ""
 
     def run_calculation(self, _ = None):
         self.cell_type = CellType.COMPUTATION
