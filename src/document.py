@@ -93,20 +93,20 @@ class Document(Gtk.Box):
         cell_editor.grab_focus()
 
     def run_calculation(self, _widget = None):
-        # get all expressions in the document
-        expressions = [c.get_expression() for c in self.cells]
+        computed_cells = [c for c in self.cells if c.cell_type == CellType.COMPUTATION]
 
-        # Empty rows get discarded by qalc -> empty rows replaced by zero and None discarded
-        expressions = ['0' if e == '' else e for e in expressions if e is not None]
+        # get all expressions in the document
+        expressions = [c.get_expression() for c in computed_cells]
+
+        # Empty rows get discarded by qalc -> empty rows replaced by zero
+        expressions = ['0' if e == '' else e for e in expressions]
 
         # calculate the results
         result_string = self.qalc.qalculate('\n'.join(expressions))
         results = result_string.split('\n') #! note last element empty
 
-        calculation_cells = [c for c in self.cells if c.cell_type is CellType.COMPUTATION]
-
         # update labels
-        for (c, r) in zip(calculation_cells, results):
+        for (c, r) in zip(computed_cells, results):
             c.update_result(r)
 
     def save_file(self, file):
@@ -156,6 +156,7 @@ class Document(Gtk.Box):
         if len([0 for c in self.cells]) == 1:
             for c in self.cells:
                 c.set_deletability(False)
+
 
         self.run_calculation()
 

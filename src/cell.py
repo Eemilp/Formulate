@@ -104,13 +104,13 @@ class Cell(Adw.Bin):
         self.emit("calculate")
 
     def get_editor(self):
-        if self.cell_type == CellType.MATH:
+        if self.cell_type == CellType.MATH or self.cell_type == CellType.COMPUTATION:
             return self.cell_centerbox.get_center_widget().viewport.get_child()
         else:
             return self.cell_centerbox.get_center_widget().get_child()
 
     def get_cell_content(self):
-        if self.cell_type == CellType.MATH:
+        if self.cell_type == CellType.MATH or self.cell_type == CellType.COMPUTATION:
             expr = self.cell_centerbox.get_center_widget().viewport.get_child().expr
             return expr.to_latex()
         if self.cell_type == CellType.TEXT:
@@ -125,7 +125,7 @@ class Cell(Adw.Bin):
             return text
         else:
             print("Oh no!")
-            return 0;
+            return "";
 
     # Essentially passing through button signals
     def add_cell_button_clicked(self, widget, _, data=CellType.MATH):
@@ -135,5 +135,3 @@ class Cell(Adw.Bin):
 
     def set_deletability(self, deletable):
         self.remove_cell_button.set_sensitive(deletable)
-
-    # TODO make add and remove signs invisible when cell is not focused
