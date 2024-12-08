@@ -23,6 +23,7 @@ from gi.repository import Gio, GLib
 from .formulabox import FormulaBox
 from .qalculator import Qalculator
 from .cell import Cell, CellType
+from .converter import *
 import json # for saving and loading
 
 @Gtk.Template(resource_path='/com/github/eemilp/Formulate/document.ui')
@@ -180,6 +181,7 @@ class Document(Gtk.Box):
         data_str = '\n\n'.join(lines)
 
         # TODO pdf conversion
+        data_str = create_tex_source(data_str)
 
         bytes = GLib.Bytes.new(data_str.encode('utf-8'))
 

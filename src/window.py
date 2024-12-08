@@ -77,11 +77,7 @@ class FormulateWindow(Adw.ApplicationWindow):
 
 
     def export_dialog(self, action, _):
-        filter = Gtk.FileFilter()
-        filter.add_suffix('md')
         native = Gtk.FileDialog()
-        native.set_default_filter(filter)
-        native.set_initial_name('Document.md')
         native.save(self, None, self.on_export_response)
 
     def on_export_response(self, dialog, result):

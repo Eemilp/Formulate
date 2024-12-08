@@ -55,6 +55,7 @@ formulate_sources = [
   'document.py',
   'cell.py',
   'textbox.py',
+  'converter.py',
 ]
 
 install_data(formulate_sources, install_dir: moduledir)
