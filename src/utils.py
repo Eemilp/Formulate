@@ -23,7 +23,7 @@ import gi
 from gi.repository import GLib, Gtk, Gdk, cairo, Pango, PangoCairo, GObject, Gio
 import importlib.resources as resources
 
-desc = Pango.font_description_from_string("Latin Modern Math 20")
+desc = Pango.font_description_from_string("Latin Modern Math 18")
 
 def add_shortcut_to_action(widget, shortcut, action_name):
     shortcut_trigger = Gtk.ShortcutTrigger.parse_string(shortcut)
