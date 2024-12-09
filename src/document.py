@@ -25,6 +25,7 @@ from .qalculator import Qalculator
 from .cell import Cell, CellType
 from .converter import *
 import json # for saving and loading
+from collections import deque
 
 @Gtk.Template(resource_path='/com/github/eemilp/Formulate/document.ui')
 class Document(Gtk.Box):
@@ -37,6 +38,8 @@ class Document(Gtk.Box):
     cells = Gtk.Template.Child("cells")
     toast_overlay = Gtk.Template.Child("toast_overlay")
 
+    cell_history = deque()
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -46,15 +49,52 @@ class Document(Gtk.Box):
             c.set_deletability(False)
 
     def remove_cell(self, cell):
+        # Move this Box to BoxList and add position tracking to do the undo action
+        # undo toast
         toast = Adw.Toast.new("Deleted cell")
+        toast.set_button_label("Undo")
+        toast.set_priority(1) #high prio
+        toast.connect("dismissed", self.dismissed_undo_toast)
+        toast.connect("button_clicked", self.toast_undo)
+
         self.toast_overlay.add_toast(toast)
 
+        pos = [c for c in self.cells].index(cell)
+
         self.cells.remove(cell)
+        self.cell_history.append({'pos':pos, 'cell':cell})
+
+        # if computation we need to recompute to not have internal state
+        if cell.cell_type == CellType.COMPUTATION:
+            self.run_calculation()
 
         #Juggling deletability so that only cell cannot be deleted
         if len([0 for c in self.cells]) == 1:
             for c in self.cells:
                 c.set_deletability(False)
+
+    def toast_undo(self, _ = None):
+        cell = self.cell_history[-1]['cell']
+        pos = self.cell_history[-1]['pos']
+
+        #all this to get the cell before the position or None
+        cells = [None]
+        cells.extend([c for c in self.cells])
+        cell_before = cells[pos]
+        self.cells.insert_child_after(cell, cell_before)
+
+        if len(cells) == 2: # if there was only one cell left
+            cells[1].set_deletability(True)
+
+        # if computation we need to recompute to not have internal state
+        if cell.cell_type == CellType.COMPUTATION:
+            self.run_calculation()
+
+
+
+    def dismissed_undo_toast(self, _ = None):
+        self.cell_history.pop()
+
 
     def add_cell_after(self, old_cell, cell_type):
         #Juggling deletability so that only cell cannot be deleted
