@@ -39,7 +39,6 @@ class Document(Gtk.Box):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-
         # add an empty cell
         self.append_cell()
         for c in self.cells:
@@ -178,7 +177,7 @@ class Document(Gtk.Box):
                 return c.get_cell_content()
 
         lines = [get_md(c) for c in self.cells]
-        data_str = '\n\n'.join(lines)
+        data_str = '\n'.join(lines)
 
         # TODO pdf conversion
         data_str = create_tex_source(data_str)

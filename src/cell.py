@@ -23,6 +23,7 @@ from gi.repository import GObject, Gio, GLib
 # from .formula import Editor
 from .formulabox import FormulaBox
 from .textbox import TextBox
+from .utils import add_shortcut_to_action
 from enum import IntEnum
 
 # different types of cells
@@ -47,6 +48,8 @@ class Cell(Adw.Bin):
     cell_type = None
 
     def __init__(self, cell_type, data=None, **kwargs):
+        add_shortcut_to_action(self, "<Ctrl>t", "add.text")
+        add_shortcut_to_action(self, "<Ctrl>m", "add.math")
         super().__init__(**kwargs)
         self.cell_type = cell_type
         if cell_type == CellType.MATH or cell_type == CellType.COMPUTATION:
@@ -82,7 +85,6 @@ class Cell(Adw.Bin):
         add_menu_group = Gio.SimpleActionGroup()
         add_menu_group.add_action(add_math_action)
         add_menu_group.add_action(add_text_action)
-
         self.insert_action_group("add", add_menu_group)
 
         self.remove_cell_button.connect("clicked", self.remove_cell_button_clicked)
