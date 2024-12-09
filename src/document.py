@@ -31,10 +31,8 @@ from collections import deque
 class Document(Gtk.Box):
     __gtype_name__ = 'Document'
 
-    # calculator object
     qalc = Qalculator()
 
-    # Cells in
     cells = Gtk.Template.Child("cells")
     toast_overlay = Gtk.Template.Child("toast_overlay")
 
@@ -49,7 +47,6 @@ class Document(Gtk.Box):
             c.set_deletability(False)
 
     def remove_cell(self, cell):
-        # Move this Box to BoxList and add position tracking to do the undo action
         # undo toast
         toast = Adw.Toast.new("Deleted cell")
         toast.set_button_label("Undo")
@@ -89,8 +86,6 @@ class Document(Gtk.Box):
         # if computation we need to recompute to not have internal state
         if cell.cell_type == CellType.COMPUTATION:
             self.run_calculation()
-
-
 
     def dismissed_undo_toast(self, _ = None):
         self.cell_history.pop()
