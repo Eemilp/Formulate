@@ -44,7 +44,7 @@ class Cursor():
         self.selecting = False
         self.selection_bounds = None
         self.selection_ancestor = None
-        self.selection_rgba = [0.5, 0.5, 1, 0.6]
+        self.selection_rgba = [0.5, 0.5, 1, 0.6] # TODO use selected highlight color
         self._position = (0., 0.)     # absolute position in widget (in pixels)
         self.position_changed = False  # set to True when self.position changes
         self.clipboard = self.editor.get_clipboard()
