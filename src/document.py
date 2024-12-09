@@ -35,6 +35,7 @@ class Document(Gtk.Box):
 
     # Cells in
     cells = Gtk.Template.Child("cells")
+    toast_overlay = Gtk.Template.Child("toast_overlay")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -45,6 +46,9 @@ class Document(Gtk.Box):
             c.set_deletability(False)
 
     def remove_cell(self, cell):
+        toast = Adw.Toast.new("Deleted cell")
+        self.toast_overlay.add_toast(toast)
+
         self.cells.remove(cell)
 
         #Juggling deletability so that only cell cannot be deleted
@@ -132,8 +136,12 @@ class Document(Gtk.Box):
            display_name = info.get_attribute_string("standard::display-name")
         else:
             display_name = file.get_basename()
+
+        toast = Adw.Toast.new("Saved " + display_name)
         if not res:
-            print(f"Unable to save {display_name}")
+            toast = Adw.Toast.new(f"Unable to save {display_name}")
+
+        self.toast_overlay.add_toast(toast)
 
     def open_file(self, file):
         file.load_contents_async(None, self.open_file_complete)

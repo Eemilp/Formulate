@@ -4,10 +4,12 @@ using Adw 1;
 template $Document : Gtk.Box {
       halign: fill;
 
-      Box cells {
-        spacing: 5;
-        hexpand: true;
-        orientation: vertical;
-        homogeneous: false;
+      Adw.ToastOverlay toast_overlay {
+        Box cells {
+          spacing: 5;
+          hexpand: true;
+          orientation: vertical;
+          homogeneous: false;
+        }
       }
 }
