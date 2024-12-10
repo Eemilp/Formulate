@@ -38,8 +38,10 @@ class FormulateApplication(Adw.Application):
         # self.create_action('preferences', self.on_preferences_action) # no preferences for now
 
         # Adding other accelerators
-        self.set_accels_for_action('win.save-as',['<Ctrl>s'])
+        self.set_accels_for_action('win.save-as',['<Ctrl><Shift>s'])
+        self.set_accels_for_action('win.save',['<Ctrl>s'])
         self.set_accels_for_action('win.open',   ['<Ctrl>o'])
+        self.set_accels_for_action('win.new',   ['<Ctrl>n'])
 
     def do_activate(self):
         """Called when the application is activated.

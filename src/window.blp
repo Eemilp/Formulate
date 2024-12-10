@@ -16,25 +16,45 @@ template $FormulateWindow : Adw.ApplicationWindow {
         tooltip-text: _("Menu");
         menu-model: primary_menu;
       }
+      [end]
+      Button export{
+        icon-name: "send-to-symbolic";
+        action-name: "win.export";
+        tooltip-text: _("Export");
+      }
       Button open_document{
         icon-name: "document-open-symbolic";
         action-name: "win.open";
+        tooltip-text: _("Open");
       }
-      Button save_as_document{
-        icon-name: "document-save-as-symbolic";
-        action-name: "win.save-as";
+      Button new-tab{
+        icon-name: "tab-new-symbolic";
+        action-name: "win.new";
+        tooltip-text: _("New");
+      }
+    }
+    Box {
+      orientation: vertical;
+
+      Adw.TabBar {
+        view: tabs;
+      }
+
+      Adw.TabView tabs {
+        vexpand: true;
+
       }
     }
   };
 }
 
 menu primary_menu {
-  section {
-    item {
-      label: "Export";
-      action: "win.export";
-    }
-  }
+  // section {
+  //   item {
+  //     label: "Export";
+  //     action: "win.export";
+  //   }
+  // }
   section {
     // item {
       // label: _("_Preferences");

@@ -19,7 +19,7 @@
 
 from gi.repository import Adw
 from gi.repository import Gtk
-from gi.repository import Gio, GLib
+from gi.repository import Gio, GLib, GObject
 from .formulabox import FormulaBox
 from .qalculator import Qalculator
 from .cell import Cell, CellType
@@ -30,6 +30,10 @@ from collections import deque
 @Gtk.Template(resource_path='/com/github/eemilp/Formulate/document.ui')
 class Document(Gtk.Box):
     __gtype_name__ = 'Document'
+    __gsignals__ = {
+        'file_opened' : (GObject.SignalFlags.RUN_LAST, None, ()),
+        'file_saved' : (GObject.SignalFlags.RUN_LAST, None, ()),
+    }
 
     qalc = Qalculator()
 
@@ -38,9 +42,18 @@ class Document(Gtk.Box):
 
     cell_history = deque()
 
+    file = None
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+        self.add_no_cells_page()
+        self.cells.connect("row-activated", self.row_selected)
+
+        # add an empty cell
+        # self.append_cell()
+
+    def add_no_cells_page(self):
         #constructing the status page
         empty_notebook_page = Adw.StatusPage.new()
         empty_notebook_page.set_title("Empty Notebook")
@@ -55,14 +68,6 @@ class Document(Gtk.Box):
         button_box.append(add_text_button)
         empty_notebook_page.set_child(button_box)
         self.cells.set_placeholder(empty_notebook_page)
-
-        self.cells.connect("row-activated", self.row_selected)
-
-
-        add_math_button.grab_focus()
-
-        # add an empty cell
-        # self.append_cell()
 
     def remove_cell(self, cell):
         # undo toast
@@ -137,6 +142,12 @@ class Document(Gtk.Box):
         for (c, r) in zip(computed_cells, results):
             c.update_result(r)
 
+    def empty(self):
+        return len([0 for c in self.cells]) == 1 and self.file == None
+
+    def title(self):
+        return self.file.get_basename() if self.file is not None else "Untitled"
+
     def save_file(self, file):
         # TODO version information
         cells = [c.get_child() for c in self.cells][:-1] #Due to last element being status page
@@ -166,6 +177,8 @@ class Document(Gtk.Box):
         if not res:
             toast = Adw.Toast.new(f"Unable to save {display_name}")
 
+        self.file = file
+        self.emit("file_saved")
         self.toast_overlay.add_toast(toast)
 
     def open_file(self, file):
@@ -186,11 +199,13 @@ class Document(Gtk.Box):
         cell_data = data['cells']
 
         # remove current document and add new document
-        # for c in [c for c in self.cells]: # jWow this is stupid
-            # self.cells.remove(c)
+        self.cells.remove_all()
+        self.add_no_cells_page()
         for d in cell_data:
             self.add_cell(None, d['type'], d['content'])
 
+        self.file = file
+        self.emit("file_opened")
         self.run_calculation()
 
     def export_file(self, file, type = 'md'):

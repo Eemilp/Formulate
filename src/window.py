@@ -30,24 +30,54 @@ class FormulateWindow(Adw.ApplicationWindow):
     header_bar = Gtk.Template.Child("header_bar")
     main_view = Gtk.Template.Child("main_view")
 
+    tabs = Gtk.Template.Child("tabs")
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # add a new document
-        new_document = Document()
-        self.main_view.set_content(new_document)
 
         # Saving and loading actions
         open_action = Gio.SimpleAction(name="open")
         open_action.connect("activate", self.open_file_dialog)
         self.add_action(open_action)
 
-        save_action = Gio.SimpleAction(name="save-as")
-        save_action.connect("activate", self.save_file_dialog)
+        save_action = Gio.SimpleAction(name="save")
+        save_action.connect("activate", self.save)
         self.add_action(save_action)
+
+        save_as_action = Gio.SimpleAction(name="save-as")
+        save_as_action.connect("activate", self.save_file_dialog)
+        self.add_action(save_as_action)
 
         export_action = Gio.SimpleAction(name="export")
         export_action.connect("activate", self.export_dialog)
         self.add_action(export_action)
+
+        new_action = Gio.SimpleAction(name="new")
+        new_action.connect("activate", self.add_tab)
+        self.add_action(new_action)
+
+        # add initial tab
+        self.add_tab()
+
+    def add_tab(self, from_widget = None, from_file = None):
+        document = Document()
+        document.connect("file_opened", self.update_tab_labels)
+        document.connect("file_saved", self.update_tab_labels)
+        page = self.tabs.append(document)
+        if from_file is not None:
+            document.open_file(from_file)
+        else:
+            page.set_title(document.title())
+        self.tabs.set_selected_page(page)
+
+    def update_tab_labels(self, _):
+        pages = [p for p in self.tabs.get_pages()]
+        for page in pages:
+            title = page.get_child().title()
+            page.set_title(title)
+
+    def get_open_document(self):
+        return self.tabs.get_selected_page().get_child()
 
 
     def open_file_dialog(self, action, _):
@@ -58,9 +88,21 @@ class FormulateWindow(Adw.ApplicationWindow):
         native.open(self, None, self.on_open_response)
 
     def on_open_response(self, dialog, result):
+        document = self.get_open_document()
         file = dialog.open_finish(result)
         if file is not None:
-            self.main_view.get_content().open_file(file)
+            if document.empty() is True:
+                document.open_file(file)
+            else:
+                self.add_tab(None, file)
+
+    def save(self, action, _):
+        document = self.get_open_document()
+        if document.file is None:
+            self.save_file_dialog(action, None)
+        else:
+            # just save the file
+            self.get_open_document().save_file(document.file)
 
     def save_file_dialog(self, action, _):
         filter = Gtk.FileFilter()
@@ -71,9 +113,10 @@ class FormulateWindow(Adw.ApplicationWindow):
         native.save(self, None, self.on_save_response)
 
     def on_save_response(self, dialog, result):
+        document = self.get_open_document()
         file = dialog.save_finish(result)
         if file is not None:
-            self.main_view.get_content().save_file(file)
+            document.save_file(file)
 
 
     def export_dialog(self, action, _):
@@ -83,5 +126,5 @@ class FormulateWindow(Adw.ApplicationWindow):
     def on_export_response(self, dialog, result):
         file = dialog.save_finish(result)
         if file is not None:
-            self.main_view.get_content().export_file(file)
+            self.get_open_document().export_file(file)
 
