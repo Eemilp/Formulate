@@ -186,8 +186,8 @@ class Document(Gtk.Box):
         cell_data = data['cells']
 
         # remove current document and add new document
-        for c in [c for c in self.cells]: # Wow this is stupid
-            self.cells.remove(c)
+        # for c in [c for c in self.cells]: # jWow this is stupid
+            # self.cells.remove(c)
         for d in cell_data:
             self.add_cell(None, d['type'], d['content'])
 
@@ -204,7 +204,7 @@ class Document(Gtk.Box):
             else:
                 return c.get_cell_content()
 
-        lines = [get_md(c.get_child()) for c in cells]
+        lines = [get_md(c) for c in cells]
         data_str = '\n'.join(lines)
 
         # TODO pdf conversion
