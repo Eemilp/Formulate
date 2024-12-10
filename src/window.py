@@ -73,7 +73,7 @@ class FormulateWindow(Adw.ApplicationWindow):
     def on_save_response(self, dialog, result):
         file = dialog.save_finish(result)
         if file is not None:
-            self.scrolled_window.get_child().get_child().save_file(file)
+            self.main_view.get_content().save_file(file)
 
 
     def export_dialog(self, action, _):
@@ -83,5 +83,5 @@ class FormulateWindow(Adw.ApplicationWindow):
     def on_export_response(self, dialog, result):
         file = dialog.save_finish(result)
         if file is not None:
-            self.scrolled_window.get_child().get_child().export_file(file)
+            self.main_view.get_content().export_file(file)
 
