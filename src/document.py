@@ -43,8 +43,8 @@ class Document(Gtk.Box):
 
         # add an empty cell
         self.append_cell()
-        for c in self.cells:
-            c.set_deletability(False)
+        # for c in self.cells:
+            # c.set_deletability(False)
 
     def remove_cell(self, cell):
         # undo toast
@@ -56,9 +56,9 @@ class Document(Gtk.Box):
 
         self.toast_overlay.add_toast(toast)
 
-        pos = [c for c in self.cells].index(cell)
+        pos = cell.get_parent().get_index()
 
-        self.cells.remove(cell)
+        self.cells.remove(cell.get_parent())
         self.cell_history.append({'pos':pos, 'cell':cell})
 
         # if computation we need to recompute to not have internal state
@@ -66,22 +66,18 @@ class Document(Gtk.Box):
             self.run_calculation()
 
         #Juggling deletability so that only cell cannot be deleted
-        if len([0 for c in self.cells]) == 1:
-            for c in self.cells:
-                c.set_deletability(False)
+        # if len([0 for c in self.cells]) == 1:
+            # for c in self.cells:
+                # c.set_deletability(False)
 
     def toast_undo(self, _ = None):
         cell = self.cell_history[-1]['cell']
         pos = self.cell_history[-1]['pos']
 
-        #all this to get the cell before the position or None
-        cells = [None]
-        cells.extend([c for c in self.cells])
-        cell_before = cells[pos]
-        self.cells.insert_child_after(cell, cell_before)
+        self.cells.insert(cell, pos)
 
-        if len(cells) == 2: # if there was only one cell left
-            cells[1].set_deletability(True)
+        # if len(cells) == 2: # if there was only one cell left
+            # cells[1].get_child().set_deletability(True)
 
         # if computation we need to recompute to not have internal state
         if cell.cell_type == CellType.COMPUTATION:
@@ -93,9 +89,9 @@ class Document(Gtk.Box):
 
     def add_cell_after(self, old_cell, cell_type):
         #Juggling deletability so that only cell cannot be deleted
-        if len([0 for c in self.cells]) == 1:
-            for c in self.cells:
-                c.set_deletability(True)
+        # if len([0 for c in self.cells]) == 1:
+            # for c in self.cells:
+                # c.set_deletability(True)
 
         new_cell = Cell(cell_type)
 
@@ -108,15 +104,16 @@ class Document(Gtk.Box):
         new_cell.connect("remove_cell", self.remove_cell)
 
         # insert new cell and move focus to it
-        self.cells.insert_child_after(new_cell, old_cell)
+        index = old_cell.get_parent().get_index() + 1
+        self.cells.insert(new_cell, index)
         cell_editor.grab_focus()
 
     # Ugly but needed for adding the initial cell
     def append_cell(self, cell_type = CellType.TEXT, cell_data = None):
         #Juggling deletability so that only cell cannot be deleted
-        if len([0 for c in self.cells]) == 1:
-            for c in self.cells:
-                c.set_deletability(True)
+        # if len([0 for c in self.cells]) == 1:
+            # for c in self.cells:
+                # c.set_deletability(True)
 
         new_cell = Cell(cell_type, cell_data)
         cell_editor = new_cell.get_editor()
@@ -182,6 +179,7 @@ class Document(Gtk.Box):
         file.load_contents_async(None, self.open_file_complete)
 
     def open_file_complete(self, file, result):
+        # TODO error handling
         contents = file.load_contents_finish(result)
         if not contents[0]:
             path = file.peek_path()

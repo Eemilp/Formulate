@@ -5,11 +5,11 @@ template $Document : Gtk.Box {
       halign: fill;
 
       Adw.ToastOverlay toast_overlay {
-        Box cells {
-          spacing: 5;
-          hexpand: true;
-          orientation: vertical;
-          homogeneous: false;
+        ScrolledWindow scrolled_window {
+          ListBox cells {
+            selection-mode: none;
+            hexpand: true;
+          }
         }
       }
 }

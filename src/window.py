@@ -28,13 +28,13 @@ class FormulateWindow(Adw.ApplicationWindow):
 
 
     header_bar = Gtk.Template.Child("header_bar")
-    scrolled_window = Gtk.Template.Child("scrolled_window")
+    main_view = Gtk.Template.Child("main_view")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # add a new document
         new_document = Document()
-        self.scrolled_window.set_child(new_document)
+        self.main_view.set_content(new_document)
 
         # Saving and loading actions
         open_action = Gio.SimpleAction(name="open")
@@ -60,7 +60,7 @@ class FormulateWindow(Adw.ApplicationWindow):
     def on_open_response(self, dialog, result):
         file = dialog.open_finish(result)
         if file is not None:
-            self.scrolled_window.get_child().get_child().open_file(file)
+            self.main_view.get_content().open_file(file)
 
     def save_file_dialog(self, action, _):
         filter = Gtk.FileFilter()

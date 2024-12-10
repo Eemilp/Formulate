@@ -6,7 +6,7 @@ template $FormulateWindow : Adw.ApplicationWindow {
   default-height: 600;
   title: "Formulate";
   content:
-  Adw.ToolbarView {
+  Adw.ToolbarView main_view{
     [top]
     Adw.HeaderBar header_bar {
       [end]
@@ -25,14 +25,6 @@ template $FormulateWindow : Adw.ApplicationWindow {
         action-name: "win.save-as";
       }
     }
-    content:
-    ScrolledWindow scrolled_window {
-      propagate-natural-height: true;
-      Box document {
-        // halign: center;
-        hexpand: true;
-      }
-    };
   };
 }
 
