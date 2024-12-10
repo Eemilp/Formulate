@@ -10,7 +10,7 @@
    id="svg11300"
    sodipodi:version="0.32"
    inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
-   sodipodi:docname="Formulate.svg"
+   sodipodi:docname="Formulate icon.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    version="1.0"
    style="display:inline;enable-background:new"
@@ -31,11 +31,11 @@
        id="linearGradient46"
        inkscape:collect="always">
       <stop
-         style="stop-color:#6b886b;stop-opacity:1;"
+         style="stop-color:#6d866d;stop-opacity:1;"
          offset="0"
          id="stop47" />
       <stop
-         style="stop-color:#709070;stop-opacity:1;"
+         style="stop-color:#748c74;stop-opacity:1;"
          offset="1"
          id="stop48" />
     </linearGradient>
@@ -43,11 +43,11 @@
        id="linearGradient45"
        inkscape:label="default">
       <stop
-         style="stop-color:#71859c;stop-opacity:1;"
+         style="stop-color:#768f97;stop-opacity:1;"
          offset="0"
          id="stop45" />
       <stop
-         style="stop-color:#93a6b3;stop-opacity:1;"
+         style="stop-color:#adc2c7;stop-opacity:1;"
          offset="1"
          id="stop46" />
     </linearGradient>
@@ -74,7 +74,7 @@
        inkscape:swatch="solid"
        inkscape:label="dark accent">
       <stop
-         style="stop-color:#3a4660;stop-opacity:1;"
+         style="stop-color:#415059;stop-opacity:1;"
          offset="0"
          id="stop17" />
     </linearGradient>
@@ -82,7 +82,7 @@
        id="swatch15"
        inkscape:label="default">
       <stop
-         style="stop-color:#71859c;stop-opacity:1;"
+         style="stop-color:#7a8e93;stop-opacity:1;"
          offset="0"
          id="stop15" />
     </linearGradient>
@@ -352,8 +352,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="5.6568543"
-     inkscape:cx="68.589358"
-     inkscape:cy="56.214989"
+     inkscape:cx="68.589357"
+     inkscape:cy="56.391765"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:grid-bbox="true"
@@ -795,7 +795,7 @@
        y="182"
        ry="8" />
     <rect
-       style="fill:#f6f5f4;stroke-width:0.999998;stroke-opacity:0.127596"
+       style="fill:#f5f3d9;stroke-width:0.999998;stroke-opacity:0.127596;fill-opacity:1"
        id="rect2"
        width="79.529785"
        height="88.513863"
@@ -811,7 +811,7 @@
        y="180.49496"
        ry="8" />
     <rect
-       style="display:inline;fill:url(#linearGradient43);stroke-width:0.999989;stroke-opacity:0.127596;enable-background:new"
+       style="display:inline;fill:url(#linearGradient43);stroke-width:1;stroke-opacity:0.127596;enable-background:new;stroke-dasharray:none"
        id="rect1-6-2-7"
        width="87.009979"
        height="100.95823"
