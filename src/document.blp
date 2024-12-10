@@ -6,6 +6,7 @@ template $Document : Gtk.Box {
       Adw.ToastOverlay toast_overlay {
         ScrolledWindow scrolled_window {
           ListBox cells {
+            styles ["cell_list"]
             selection-mode: none;
             hexpand: true;
           }

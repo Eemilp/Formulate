@@ -121,6 +121,7 @@ class FormulateWindow(Adw.ApplicationWindow):
 
     def export_dialog(self, action, _):
         native = Gtk.FileDialog()
+        native.set_initial_name('Document.tex')
         native.save(self, None, self.on_export_response)
 
     def on_export_response(self, dialog, result):

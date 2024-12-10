@@ -1,3 +1,11 @@
-.frame {
-    background-color: @view_bg_color;
+/* .frame { */
+    /* background-color: @view_bg_color; */
+/* } */
+
+.textbox {
+    border-radius: 8px;
+}
+
+.cell_list {
+    background-color: @window_bg_color;
 }
