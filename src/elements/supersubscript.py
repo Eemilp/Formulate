@@ -104,10 +104,10 @@ class SuperscriptSubscript(element.Element):
     def to_str(self):
         res = ""
         if self.subscript is not None:
-            if len(self.subscript.elements) == 1:
-                res += "_" + self.subscript.to_str()
-            else:
-                res += "_(" + self.subscript.to_str() + ")"
+            # if len(self.subscript.elements) == 1:
+            res += "_" + self.subscript.to_str()
+            # else:
+                # res += "_(" + self.subscript.to_str() + ")"
         if self.exponent is not None:
             res += "^(" + self.exponent.to_str() + ")"
         return res
