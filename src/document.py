@@ -58,8 +58,8 @@ class Document(Gtk.Box):
         empty_notebook_page = Adw.StatusPage.new()
         empty_notebook_page.set_title("Empty Notebook")
         empty_notebook_page.set_description("Add cell")
-        add_math_button = Gtk.Button.new_with_label("Math")
-        add_text_button = Gtk.Button.new_with_label("Text")
+        add_math_button = Gtk.Button.new_with_mnemonic("_Math")
+        add_text_button = Gtk.Button.new_with_mnemonic("_Text")
         add_math_button.connect("clicked", self.add_cell, CellType.MATH)
         add_text_button.connect("clicked", self.add_cell, CellType.TEXT)
         button_box = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 5)
@@ -76,7 +76,6 @@ class Document(Gtk.Box):
         toast.set_priority(1) #high prio
         toast.connect("dismissed", self.dismissed_undo_toast)
         toast.connect("button_clicked", self.toast_undo)
-
         self.toast_overlay.add_toast(toast)
 
         pos = cell.get_parent().get_index()
