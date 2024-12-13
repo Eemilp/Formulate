@@ -43,6 +43,7 @@ class Document(Gtk.Box):
     cell_history = deque()
 
     file = None
+    edited = False
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -105,6 +106,7 @@ class Document(Gtk.Box):
         new_cell.connect("calculate", self.run_calculation)
         new_cell.connect("add_cell_below", self.add_cell)
         new_cell.connect("remove_cell", self.remove_cell)
+        new_cell.connect("edit", self.on_edit)
 
         cell_editor = new_cell.get_editor()
 
@@ -122,6 +124,8 @@ class Document(Gtk.Box):
         editor = row.get_child().get_editor()
         row.get_child().get_editor().grab_focus()
 
+    def on_edit(self, _widget = None):
+        self.edited = True
 
     def run_calculation(self, _widget = None):
         cells = [c.get_child() for c in self.cells][:-1] #Due to last element being status page
@@ -177,6 +181,7 @@ class Document(Gtk.Box):
             toast = Adw.Toast.new(f"Unable to save {display_name}")
 
         self.file = file
+        self.edited = False
         self.emit("file_saved")
         self.toast_overlay.add_toast(toast)
 

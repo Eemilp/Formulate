@@ -39,6 +39,7 @@ class Cell(Adw.Bin):
         'add_cell_below': (GObject.SignalFlags.RUN_LAST, None, (int,)),
         'remove_cell': (GObject.SignalFlags.RUN_LAST, None, ()),
         'calculate' : (GObject.SignalFlags.RUN_LAST, None, ()),
+        'edit' : (GObject.SignalFlags.RUN_LAST, None, ()),
     }
 
     cell_centerbox = Gtk.Template.Child("cell_centerbox")
@@ -59,13 +60,16 @@ class Cell(Adw.Bin):
 
             # hook up the signal for calculation
             formulabox.viewport.get_child().connect("calculate", self.run_calculation)
+            formulabox.viewport.get_child().connect("edit", self.on_edit)
 
         elif cell_type == CellType.TEXT:
             # text editor implemented in an TextView
             textbox = TextBox()
 
+            buffer = textbox.textview.get_buffer()
+            buffer.connect("changed", self.on_edit)
+
             if data != None:
-                buffer = textbox.textview.get_buffer()
                 buffer.set_text(data, -1)
 
             self.cell_centerbox.set_center_widget(textbox)
@@ -109,6 +113,9 @@ class Cell(Adw.Bin):
     def run_calculation(self, _ = None):
         self.cell_type = CellType.COMPUTATION
         self.emit("calculate")
+
+    def on_edit(self, _ = None):
+        self.emit("edit")
 
     def get_editor(self):
         if self.cell_type == CellType.MATH or self.cell_type == CellType.COMPUTATION:
