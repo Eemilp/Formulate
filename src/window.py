@@ -32,10 +32,12 @@ class FormulateWindow(Adw.ApplicationWindow):
 
     tabs = Gtk.Template.Child("tabs")
 
+    # TODO on quit
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        GObject.signal_override_class_handler("close-page", self.tabs, self.close_tab)
+        self.tabs.connect("close-page", self.close_tab)
 
         # Saving and loading actions
         open_action = Gio.SimpleAction(name="open")
@@ -86,8 +88,10 @@ class FormulateWindow(Adw.ApplicationWindow):
         if document.edited is True:
             dialog = self.close_message_dialog()
             dialog.choose(None, self.close_dialog_response, tabview, page)
+            print("thing")
         else:
             tabview.close_page_finish(page, True)
+        return True # This is important
 
     def close_dialog_response(self, dialog, result, tabview, page):
         response = dialog.choose_finish(result)
@@ -97,11 +101,13 @@ class FormulateWindow(Adw.ApplicationWindow):
         if response == "discard":
             tabview.close_page_finish(page, True)
         if response == "save":
-            page.get_child().save()
+            document = page.get_child()
+            self.save(None, document)
             tabview.close_page_finish(page, True)
 
 
     def close_message_dialog(self):
+        # TODO consistent formatting
         dialog = Adw.MessageDialog.new(self)
         dialog.set_heading("Close without saving?")
         dialog.add_response("cancel", "_Cancel")
@@ -128,24 +134,26 @@ class FormulateWindow(Adw.ApplicationWindow):
             else:
                 self.add_tab(None, file)
 
-    def save(self, action, _):
-        document = self.get_open_document()
+    def save(self, action, document = None):
+        if document is None:
+            document = self.get_open_document()
         if document.file is None:
-            self.save_file_dialog(action, None)
+            self.save_file_dialog(action, document)
         else:
             # just save the file
-            self.get_open_document().save_file(document.file)
+            document.save_file(document.file)
 
-    def save_file_dialog(self, action, _):
+    def save_file_dialog(self, action, document = None):
         filter = Gtk.FileFilter()
         filter.add_suffix('fnb')
         native = Gtk.FileDialog()
         native.set_default_filter(filter)
         native.set_initial_name('Document.fnb')
-        native.save(self, None, self.on_save_response)
+        native.save(self, None, self.on_save_response, document)
 
-    def on_save_response(self, dialog, result):
-        document = self.get_open_document()
+    def on_save_response(self, dialog, result, document = None):
+        if document is None:
+            document = self.get_open_document()
         file = dialog.save_finish(result)
         if file is not None:
             document.save_file(file)
