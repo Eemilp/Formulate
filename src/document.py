@@ -84,6 +84,8 @@ class Document(Gtk.Box):
         self.cells.remove(cell.get_parent())
         self.cell_history.append({'pos':pos, 'cell':cell})
 
+        self.edited = True
+
         # if computation we need to recompute to not have internal state
         if cell.cell_type == CellType.COMPUTATION:
             self.run_calculation()
@@ -116,7 +118,9 @@ class Document(Gtk.Box):
         else:
             self.cells.append(new_cell)
 
-        row = new_cell.get_parent()
+        # row = new_cell.get_parent()
+
+        self.edited = True
 
         cell_editor.grab_focus()
 

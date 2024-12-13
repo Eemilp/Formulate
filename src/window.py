@@ -19,7 +19,7 @@
 
 from gi.repository import Adw
 from gi.repository import Gtk
-from gi.repository import Gio
+from gi.repository import Gio, GObject
 from .document import Document
 
 @Gtk.Template(resource_path='/com/github/eemilp/Formulate/window.ui')
@@ -34,6 +34,8 @@ class FormulateWindow(Adw.ApplicationWindow):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+        GObject.signal_override_class_handler("close-page", self.tabs, self.close_tab)
 
         # Saving and loading actions
         open_action = Gio.SimpleAction(name="open")
@@ -79,7 +81,37 @@ class FormulateWindow(Adw.ApplicationWindow):
     def get_open_document(self):
         return self.tabs.get_selected_page().get_child()
 
+    def close_tab(self, tabview, page, _ = None):
+        document = page.get_child()
+        if document.edited is True:
+            dialog = self.close_message_dialog()
+            dialog.choose(None, self.close_dialog_response, tabview, page)
+        else:
+            tabview.close_page_finish(page, True)
 
+    def close_dialog_response(self, dialog, result, tabview, page):
+        response = dialog.choose_finish(result)
+        print(response)
+        if response == "cancel":
+            tabview.close_page_finish(page, False)
+        if response == "discard":
+            tabview.close_page_finish(page, True)
+        if response == "save":
+            page.get_child().save()
+            tabview.close_page_finish(page, True)
+
+
+    def close_message_dialog(self):
+        dialog = Adw.MessageDialog.new(self)
+        dialog.set_heading("Close without saving?")
+        dialog.add_response("cancel", "_Cancel")
+        dialog.add_response("discard", "_Discard")
+        dialog.add_response("save", "_Save")
+        return dialog
+
+
+
+    # Saving, opening, exporting
     def open_file_dialog(self, action, _):
         filter = Gtk.FileFilter()
         filter.add_suffix('fnb')
@@ -91,7 +123,7 @@ class FormulateWindow(Adw.ApplicationWindow):
         document = self.get_open_document()
         file = dialog.open_finish(result)
         if file is not None:
-            if document.empty() is True:
+            if document.empty() is True or document.edited is False:
                 document.open_file(file)
             else:
                 self.add_tab(None, file)
