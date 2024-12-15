@@ -156,10 +156,9 @@ class Document(Gtk.Box):
         return self.file.get_basename() if self.file is not None else "Untitled"
 
     def save_file(self, file):
-        # TODO version information
         cells = [c.get_child() for c in self.cells][:-1] #Due to last element being status page
         cell_data = [dict(type=c.cell_type, content=c.get_cell_content()) for c in cells]
-        data = dict(version="0.1.0", cells=cell_data)
+        data = dict(version="0.2.0", cells=cell_data)
         data_str = json.dumps(data)
         bytes = GLib.Bytes.new(data_str.encode('utf-8'))
 
@@ -213,6 +212,7 @@ class Document(Gtk.Box):
             self.add_cell(None, d['type'], d['content'])
 
         self.file = file
+        self.edited = False
         self.emit("file_opened")
         self.run_calculation()
 

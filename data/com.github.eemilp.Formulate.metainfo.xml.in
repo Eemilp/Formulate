@@ -58,14 +58,24 @@
   <!-- </screenshots> -->
 
   <releases>
+    <release version="0.2.0" date="2024-12-15">
+      <url type="details"></url>
+      <description translate="no">
+        <p>0.2.0 bring many usability improvements</p>
+        <ul>
+          <li>Added ability to have multiple files open at the same time</li>
+          <li>Exporting notebooks to .tex files</li>
+          <li>Keyboard shortcuts for adding cells</li>
+          <li>Undo popup when deleting cells</li>
+          <li>Fixed bug where adding cells would change the scroll position</li>
+          <li>Equation selections now follow the accent color</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.1.0" date="2024-12-07">
       <url type="details"></url>
       <description translate="no">
         <p>Initial alpha release</p>
-        <!-- <ul> -->
-          <!-- <li>List of changes</li> -->
-          <!-- <li>List of changes</li> -->
-        <!-- </ul> -->
       </description>
     </release>
   </releases>

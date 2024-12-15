@@ -61,7 +61,7 @@ class FormulateApplication(Adw.Application):
                                 application_name='Formulate',
                                 application_icon='com.github.eemilp.Formulate',
                                 developer_name='Eemil Praks',
-                                version='0.1.0',
+                                version='0.2.0',
                                 developers=['Eemil Praks'],
                                 copyright='© 2024 Eemil Praks',
                                 comments='A calculator to solve problems.\n\nBased on work by Alex Huntley and Hanna Knutsson')
@@ -85,13 +85,6 @@ class FormulateApplication(Adw.Application):
         self.add_action(action)
         if shortcuts:
             self.set_accels_for_action(f"app.{name}", shortcuts)
-
-    # def on_quit_action(self, widget, _):
-        # win = self.props.active_window
-
-    # def on_quit_action_finish(self):
-        # self.quit()
-
 
 
 def main(version):

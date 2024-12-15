@@ -33,8 +33,6 @@ class FormulateWindow(Adw.ApplicationWindow):
     tabs = Gtk.Template.Child("tabs")
     pages_to_close = None
 
-    # TODO on quit #0.2.0
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
