@@ -1,4 +1,5 @@
 # Formulate
+![Formulate logo](res/data/icons/hicolor/scalable/apps/com.github.eemilp.Formulate.svg)
 
 A calculator for solving problems.
 
