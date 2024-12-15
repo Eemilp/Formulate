@@ -17,7 +17,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from .data import GREEK_LETTERS
+from .data import GREEK_LETTERS, SUB_TRAFO, SUP_TRAFO
 
 def create_tex_source(md_source):
     # The main reason why this is necessary is that the formula editor uses
@@ -28,7 +28,13 @@ def create_tex_source(md_source):
         md_source = md_source.replace(unicode_char, tex_repr)
 
     # replacements on qalc outputs
-    # TODO replace sub and superscripts #0.2.0
+    suptable = {"⁰":"^0","¹":"^1","²":"^2","³":"^3","⁴":"^4","⁵":"^5","⁶":"^6","⁷":"^7","⁸":"^8","⁹":"^9","⁻":"^-"}
+    subtable = {"₀":"_0","₁":"_1","₂":"_2","₃":"_3","₄":"_4","₅":"_5","₆":"_6","₇":"_7","₈":"_8","₉":"_9","₋":"_-"}
+    for unicode_char, tex_repr in suptable.items():
+        md_source = md_source.replace(unicode_char, tex_repr)
+    for unicode_char, tex_repr in subtable.items():
+        md_source = md_source.replace(unicode_char, tex_repr)
+
     md_source = md_source.replace('·', '\\cdot ')
     md_source = md_source.replace('−', '-')
     md_source = md_source.replace('→', '\\rightarrow')
