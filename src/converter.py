@@ -28,7 +28,7 @@ def create_tex_source(md_source):
         md_source = md_source.replace(unicode_char, tex_repr)
 
     # replacements on qalc outputs
-    # TODO replace sub and superscripts
+    # TODO replace sub and superscripts #0.2.0
     md_source = md_source.replace('·', '\\cdot ')
     md_source = md_source.replace('−', '-')
     md_source = md_source.replace('→', '\\rightarrow')

@@ -33,7 +33,7 @@ class FormulateApplication(Adw.Application):
     def __init__(self):
         super().__init__(application_id='com.github.eemilp.Formulate',
                          flags=Gio.ApplicationFlags.DEFAULT_FLAGS)
-        self.create_action('quit', lambda *_: self.quit(), ['<primary>q'])
+        # self.create_action('quit', lambda *_: self.quit(), ['<primary>q'])
         self.create_action('about', self.on_about_action)
         # self.create_action('preferences', self.on_preferences_action) # no preferences for now
 
@@ -42,6 +42,7 @@ class FormulateApplication(Adw.Application):
         self.set_accels_for_action('win.save',['<Ctrl>s'])
         self.set_accels_for_action('win.open',   ['<Ctrl>o'])
         self.set_accels_for_action('win.new',   ['<Ctrl>n'])
+        self.set_accels_for_action('win.quit',   ['<Ctrl>q'])
 
     def do_activate(self):
         """Called when the application is activated.
@@ -84,6 +85,13 @@ class FormulateApplication(Adw.Application):
         self.add_action(action)
         if shortcuts:
             self.set_accels_for_action(f"app.{name}", shortcuts)
+
+    # def on_quit_action(self, widget, _):
+        # win = self.props.active_window
+
+    # def on_quit_action_finish(self):
+        # self.quit()
+
 
 
 def main(version):

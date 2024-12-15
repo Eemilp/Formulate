@@ -31,11 +31,18 @@ class FormulateWindow(Adw.ApplicationWindow):
     main_view = Gtk.Template.Child("main_view")
 
     tabs = Gtk.Template.Child("tabs")
+    pages_to_close = None
 
-    # TODO on quit
+    # TODO on quit #0.2.0
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+        self.connect("close-request", self.close_all)
+
+        quit_action = Gio.SimpleAction(name="quit")
+        quit_action.connect("activate", self.close_all)
+        self.add_action(quit_action)
 
         self.tabs.connect("close-page", self.close_tab)
 
@@ -83,38 +90,65 @@ class FormulateWindow(Adw.ApplicationWindow):
     def get_open_document(self):
         return self.tabs.get_selected_page().get_child()
 
-    def close_tab(self, tabview, page, _ = None):
+    def close_tab(self, tabview, page, next_tabs = None):
         document = page.get_child()
         if document.edited is True:
-            dialog = self.close_message_dialog()
-            dialog.choose(None, self.close_dialog_response, tabview, page)
-            print("thing")
+            dialog = self.close_message_dialog(document.title())
+            dialog.choose(self, None, self.close_dialog_response, tabview, page)
         else:
             tabview.close_page_finish(page, True)
+
+            self.close_next_page()
         return True # This is important
 
     def close_dialog_response(self, dialog, result, tabview, page):
         response = dialog.choose_finish(result)
-        print(response)
-        if response == "cancel":
+        if response == "close" or response == "cancel":
             tabview.close_page_finish(page, False)
-        if response == "discard":
-            tabview.close_page_finish(page, True)
+            self.pages_to_close = None
         if response == "save":
             document = page.get_child()
             self.save(None, document)
+            document.connect("file_saved", self.save_before_close_complete, page)
+        if response == "discard":
             tabview.close_page_finish(page, True)
 
+            self.close_next_page()
 
-    def close_message_dialog(self):
-        # TODO consistent formatting
-        dialog = Adw.MessageDialog.new(self)
-        dialog.set_heading("Close without saving?")
+    def save_before_close_complete(self, widget, page):
+        self.tabs.close_page_finish(page, True)
+        self.close_next_page()
+
+    def close_next_page(self):
+        if self.pages_to_close is not None:
+            if not self.pages_to_close:
+                self.close_all_finish(True)
+            else:
+                next_page = self.pages_to_close.pop()
+                self.tabs.close_page(next_page)
+
+
+    def close_message_dialog(self, document_name):
+        dialog = Adw.AlertDialog.new("Save your work?", document_name + " is not saved")
         dialog.add_response("cancel", "_Cancel")
         dialog.add_response("discard", "_Discard")
+        dialog.set_response_appearance("discard", Adw.ResponseAppearance.DESTRUCTIVE)
         dialog.add_response("save", "_Save")
+        dialog.set_response_appearance("save", Adw.ResponseAppearance.SUGGESTED)
+        dialog.set_default_response("cancel")
         return dialog
 
+    def close_all(self, _window = None, _= None):
+        pages = [p for p in self.tabs.get_pages()]
+        page = pages.pop()
+        self.pages_to_close = pages
+        self.tabs.close_page(page)
+        return True
+
+
+    def close_all_finish(self, close):
+        if close is True:
+            self.destroy()
 
 
     # Saving, opening, exporting
