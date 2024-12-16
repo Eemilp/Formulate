@@ -37,6 +37,7 @@ class Editor(Gtk.DrawingArea):
     __gsignals__ = {
         'edit': (GObject.SignalFlags.RUN_LAST, None, ()),
         'calculate': (GObject.SignalFlags.RUN_LAST, None, ()),
+        'newline': (GObject.SignalFlags.RUN_LAST, None, ()),
         'cursor_position': (GObject.SignalFlags.RUN_FIRST, None, (float, float)),
     }
     def __init__(self, expression=None):
@@ -142,6 +143,11 @@ class Editor(Gtk.DrawingArea):
             return True
 
         char = chr(Gdk.keyval_to_unicode(keyval))
+        if modifiers & Gdk.ModifierType.SHIFT_MASK:
+            if keyval == Gdk.KEY_Return:
+                self.emit("newline")
+                return
+
         if modifiers & Gdk.ModifierType.CONTROL_MASK:
             if char == "a":
                 self.cursor.select_all(self.expr)
@@ -261,5 +267,4 @@ class Editor(Gtk.DrawingArea):
 
     def on_realise(self, widget):
         self.set_cursor(Gdk.Cursor.new_from_name("text", None))
-
 

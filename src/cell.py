@@ -60,6 +60,8 @@ class Cell(Adw.Bin):
 
             # hook up the signal for calculation
             formulabox.viewport.get_child().connect("calculate", self.run_calculation)
+            formulabox.viewport.get_child().connect("calculate", self.add_cell_button_clicked, CellType.MATH)
+            formulabox.viewport.get_child().connect("newline", self.add_cell_button_clicked, CellType.MATH)
             formulabox.viewport.get_child().connect("edit", self.on_edit)
             formulabox.viewport.get_child().connect("notify::has-focus", self.on_focus_change)
 
