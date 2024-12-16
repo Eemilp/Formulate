@@ -61,6 +61,7 @@ class Cell(Adw.Bin):
             # hook up the signal for calculation
             formulabox.viewport.get_child().connect("calculate", self.run_calculation)
             formulabox.viewport.get_child().connect("edit", self.on_edit)
+            formulabox.viewport.get_child().connect("notify::has-focus", self.on_focus_change)
 
         elif cell_type == CellType.TEXT:
             # text editor implemented in an TextView
@@ -114,6 +115,11 @@ class Cell(Adw.Bin):
         self.cell_type = CellType.COMPUTATION
         self.emit("calculate")
 
+    def on_focus_change(self, widget, _ = None):
+        # if a computation cell is defocused, recompute
+        if self.cell_type == CellType.COMPUTATION and widget.has_focus() == False:
+            self.emit("calculate")
+
     def on_edit(self, _ = None):
         self.emit("edit")
 
@@ -147,5 +153,5 @@ class Cell(Adw.Bin):
     def remove_cell_button_clicked(self, widget):
         self.emit("remove_cell")
 
-    def set_deletability(self, deletable):
-        self.remove_cell_button.set_sensitive(deletable)
+    # def set_deletability(self, deletable):
+        # self.remove_cell_button.set_sensitive(deletable)

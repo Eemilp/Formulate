@@ -262,3 +262,4 @@ class Editor(Gtk.DrawingArea):
     def on_realise(self, widget):
         self.set_cursor(Gdk.Cursor.new_from_name("text", None))
 
+
