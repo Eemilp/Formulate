@@ -7,7 +7,7 @@ A calculator for solving problems.
 Formulate is still experimental and under development. This means that crashes and bugs will likely occur and there is no guarantees on file backwards compatability! You can lose your work!
 
 ## What?
-Formulate combines the fantastic formula editor from [Plots](https://github.com/alexhuntley/Plots) to the powerful calculator [Calculate](https://qalculate.github.io/) in a notebook style interface. It's a calculator that aims to get out of the way and let the user focus on thinking. 
+Formulate combines the fantastic formula editor from [Plots](https://github.com/alexhuntley/Plots) to the powerful calculator [Qalculate](https://qalculate.github.io/) in a notebook style interface. It's a calculator that aims to get out of the way and let the user focus on thinking. 
 ![Demo screenshot](data/demo_screenshot.png)
 
 ### Goals
