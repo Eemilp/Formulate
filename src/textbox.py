@@ -33,11 +33,11 @@ class TextBox(Adw.Bin):
         controller.connect("key-pressed", self.on_keypress)
         self.textview.add_controller(controller)
 
-    def on_keypress(self, widget, keyval, keycode, modifiers):
+    def on_keypress(self, controller, keyval, keycode, modifiers):
         if modifiers & (Gdk.ModifierType.SHIFT_MASK | Gdk.ModifierType.CONTROL_MASK):
             if keyval == Gdk.KEY_Return:
                 #TODO this is ugly although it works
-                widget.forward(self.get_parent().get_parent().get_parent())
+                controller.forward(self.get_parent().get_parent().get_parent())
                 return True
         return False
 

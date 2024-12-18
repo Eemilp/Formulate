@@ -51,9 +51,9 @@ class Cell(Adw.Bin):
     def __init__(self, cell_type, data=None, **kwargs):
         # add_shortcut_to_action(self, "<Shift>Return", "add.text")
         # add_shortcut_to_action(self, "<Ctrl>Return", "add.math")
-        add_shortcut_to_action(self, "<Shift>Return", "add.cell", GLib.Variant("(bb)", [False, False]))
-        add_shortcut_to_action(self, "<Ctrl>Return", "add.cell", GLib.Variant("(bb)", [True, True]))
-        add_shortcut_to_action(self, "<Ctrl><Shift>Return", "add.cell", GLib.Variant("(bb)", [False, True]))
+        add_shortcut_to_action(self, "<Shift>Return", "add.cell", GLib.Variant("(bb)", [False, True]))
+        add_shortcut_to_action(self, "<Ctrl>Return", "add.cell", GLib.Variant("(bb)", [True, False]))
+        add_shortcut_to_action(self, "<Ctrl><Shift>Return", "add.cell", GLib.Variant("(bb)", [False, False]))
         super().__init__(**kwargs)
         self.cell_type = cell_type
         if cell_type == CellType.MATH or cell_type == CellType.COMPUTATION:
@@ -63,6 +63,7 @@ class Cell(Adw.Bin):
 
             formulabox.viewport.get_child().connect("edit", self.on_edit)
             formulabox.viewport.get_child().connect("newline", self.add_cell_button_clicked, CellType.MATH)
+            formulabox.viewport.get_child().connect("newline", self.run_calculation)
             formulabox.viewport.get_child().connect("notify::has-focus", self.on_focus_change)
 
         elif cell_type == CellType.TEXT:
