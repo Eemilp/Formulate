@@ -25,10 +25,12 @@ import importlib.resources as resources
 
 desc = Pango.font_description_from_string("Latin Modern Math 18")
 
-def add_shortcut_to_action(widget, shortcut, action_name):
+def add_shortcut_to_action(widget, shortcut, action_name, args = None):
     shortcut_trigger = Gtk.ShortcutTrigger.parse_string(shortcut)
     shortcut_action = Gtk.ShortcutAction.parse_string("action(" + action_name + ")")
     shortcut = Gtk.Shortcut.new(shortcut_trigger, shortcut_action)
+    if args is not None:
+        shortcut.set_arguments(args)
     widget.add_shortcut(shortcut)
 
 class Direction(Enum):

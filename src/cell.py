@@ -28,9 +28,9 @@ from enum import IntEnum
 
 # different types of cells
 class CellType(IntEnum):
-    MATH = 1
-    TEXT = 2
-    COMPUTATION = 3
+    MATH = 0
+    TEXT = 1
+    COMPUTATION = 2
 
 @Gtk.Template(resource_path='/com/github/eemilp/Formulate/cell.ui')
 class Cell(Adw.Bin):
@@ -49,8 +49,11 @@ class Cell(Adw.Bin):
     cell_type = None
 
     def __init__(self, cell_type, data=None, **kwargs):
-        add_shortcut_to_action(self, "<Ctrl>t", "add.text")
-        add_shortcut_to_action(self, "<Ctrl>m", "add.math")
+        # add_shortcut_to_action(self, "<Shift>Return", "add.text")
+        # add_shortcut_to_action(self, "<Ctrl>Return", "add.math")
+        add_shortcut_to_action(self, "<Shift>Return", "add.cell", GLib.Variant("(bb)", [False, False]))
+        add_shortcut_to_action(self, "<Ctrl>Return", "add.cell", GLib.Variant("(bb)", [True, True]))
+        add_shortcut_to_action(self, "<Ctrl><Shift>Return", "add.cell", GLib.Variant("(bb)", [False, True]))
         super().__init__(**kwargs)
         self.cell_type = cell_type
         if cell_type == CellType.MATH or cell_type == CellType.COMPUTATION:
@@ -58,16 +61,14 @@ class Cell(Adw.Bin):
             formulabox = FormulaBox(data)
             self.cell_centerbox.set_center_widget(formulabox)
 
-            # hook up the signal for calculation
-            formulabox.viewport.get_child().connect("calculate", self.run_calculation)
-            formulabox.viewport.get_child().connect("calculate", self.add_cell_button_clicked, CellType.MATH)
-            formulabox.viewport.get_child().connect("newline", self.add_cell_button_clicked, CellType.MATH)
             formulabox.viewport.get_child().connect("edit", self.on_edit)
+            formulabox.viewport.get_child().connect("newline", self.add_cell_button_clicked, CellType.MATH)
             formulabox.viewport.get_child().connect("notify::has-focus", self.on_focus_change)
 
         elif cell_type == CellType.TEXT:
             # text editor implemented in an TextView
             textbox = TextBox()
+            self.cell_centerbox.set_center_widget(textbox)
 
             buffer = textbox.textview.get_buffer()
             buffer.connect("changed", self.on_edit)
@@ -75,7 +76,6 @@ class Cell(Adw.Bin):
             if data != None:
                 buffer.set_text(data, -1)
 
-            self.cell_centerbox.set_center_widget(textbox)
             pass
         else:
             print("Oh no!")
@@ -88,10 +88,16 @@ class Cell(Adw.Bin):
             name="text",
         )
         add_text_action.connect("activate", self.add_cell_button_clicked, CellType.TEXT)
+        add_cell_action = Gio.SimpleAction(
+            name="cell",
+            parameter_type=GObject.VariantType.new("(bb)")
+        )
+        add_cell_action.connect("activate", self.add_cell_below)
 
         add_menu_group = Gio.SimpleActionGroup()
         add_menu_group.add_action(add_math_action)
         add_menu_group.add_action(add_text_action)
+        add_menu_group.add_action(add_cell_action)
         self.insert_action_group("add", add_menu_group)
 
         self.remove_cell_button.connect("clicked", self.remove_cell_button_clicked)
@@ -149,11 +155,25 @@ class Cell(Adw.Bin):
             print("Oh no!")
             return "";
 
+    def add_cell_below(self, widget, data):
+        same_type = data[0]
+        compute = data[1]
+        if self.cell_type == CellType.TEXT:
+            if same_type:
+                new_type = CellType.TEXT
+            else:
+                new_type = CellType.MATH
+        else:
+            if same_type:
+                new_type = CellType.MATH
+            else:
+                new_type = CellType.TEXT
+        self.emit("add_cell_below", int(new_type))
+        if compute and self.cell_type != CellType.TEXT:
+            self.run_calculation()
+
     # Essentially passing through button signals
     def add_cell_button_clicked(self, widget, _, data=CellType.MATH):
         self.emit("add_cell_below", int(data))
     def remove_cell_button_clicked(self, widget):
         self.emit("remove_cell")
-
-    # def set_deletability(self, deletable):
-        # self.remove_cell_button.set_sensitive(deletable)

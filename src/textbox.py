@@ -18,7 +18,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from gi.repository import Adw
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 
 @Gtk.Template(resource_path='/com/github/eemilp/Formulate/textbox.ui')
 class TextBox(Adw.Bin):
@@ -28,3 +28,19 @@ class TextBox(Adw.Bin):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+        print(self.get_parent())
+        self.textview.add_controller(self.create_key_event_controller())
+
+    def create_key_event_controller(self):
+        controller = Gtk.EventControllerKey.new()
+        controller.connect("key-pressed", self.on_keypress)
+        # controller.forward(self.get_parent())
+        return controller
+
+    def on_keypress(self, widget, keyval, keycode, modifiers):
+        if modifiers & (Gdk.ModifierType.SHIFT_MASK | Gdk.ModifierType.CONTROL_MASK):
+            if keyval == Gdk.KEY_Return:
+                return True
+        return False
+

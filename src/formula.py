@@ -36,7 +36,6 @@ class Editor(Gtk.DrawingArea):
     padding = 4
     __gsignals__ = {
         'edit': (GObject.SignalFlags.RUN_LAST, None, ()),
-        'calculate': (GObject.SignalFlags.RUN_LAST, None, ()),
         'newline': (GObject.SignalFlags.RUN_LAST, None, ()),
         'cursor_position': (GObject.SignalFlags.RUN_FIRST, None, (float, float)),
     }
@@ -143,10 +142,6 @@ class Editor(Gtk.DrawingArea):
             return True
 
         char = chr(Gdk.keyval_to_unicode(keyval))
-        if modifiers & Gdk.ModifierType.SHIFT_MASK:
-            if keyval == Gdk.KEY_Return:
-                self.emit("newline")
-                return
 
         if modifiers & Gdk.ModifierType.CONTROL_MASK:
             if char == "a":
@@ -168,6 +163,11 @@ class Editor(Gtk.DrawingArea):
                 return True
             else:
                 return False
+        # Modifiers + Return handled on cell level
+        if not modifiers & (Gdk.ModifierType.SHIFT_MASK | Gdk.ModifierType.CONTROL_MASK):
+            if keyval == Gdk.KEY_Return:
+                self.emit("newline")
+                return
         if char in SUP_ATOMS:
             self.cursor.insert_superscript_subscript(superscript=True)
             self.cursor.insert(Atom(char.translate(SUP_TRAFO)))
@@ -206,9 +206,6 @@ class Editor(Gtk.DrawingArea):
             self.cursor.backspace(Direction.RIGHT)
             self.queue_draw()
             self.emit("edit")
-            return
-        if keyval == Gdk.KEY_Return:
-            self.emit("calculate")
             return
         if keyval in (Gdk.KEY_slash, Gdk.KEY_KP_Divide):
             self.cursor.greedy_insert(Frac)
@@ -267,4 +264,5 @@ class Editor(Gtk.DrawingArea):
 
     def on_realise(self, widget):
         self.set_cursor(Gdk.Cursor.new_from_name("text", None))
+
 
