@@ -29,18 +29,15 @@ class TextBox(Adw.Bin):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        print(self.get_parent())
-        self.textview.add_controller(self.create_key_event_controller())
-
-    def create_key_event_controller(self):
         controller = Gtk.EventControllerKey.new()
         controller.connect("key-pressed", self.on_keypress)
-        # controller.forward(self.get_parent())
-        return controller
+        self.textview.add_controller(controller)
 
     def on_keypress(self, widget, keyval, keycode, modifiers):
         if modifiers & (Gdk.ModifierType.SHIFT_MASK | Gdk.ModifierType.CONTROL_MASK):
             if keyval == Gdk.KEY_Return:
+                #TODO this is ugly although it works
+                widget.forward(self.get_parent().get_parent().get_parent())
                 return True
         return False
 
