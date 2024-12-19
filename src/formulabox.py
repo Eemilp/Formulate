@@ -52,7 +52,9 @@ class FormulaBox(Gtk.Box):
     def update_label(self, next_label):
         self.editor_label.set_selectable(True)
         # if there is an = sign, use an arrow for more beautiful notation
-        if('=' in self.viewport.get_child().expr.to_str()):
+        if next_label is None:
+            self.editor_label.set_label("")
+        elif('=' in self.viewport.get_child().expr.to_str()):
             formatted_label = "<span font='Latin Modern Math 18'>→ " + next_label + "</span>"
             self.editor_label.set_label(formatted_label)
         else:
