@@ -46,14 +46,17 @@ class Cell(Adw.Bin):
     remove_cell_button = Gtk.Template.Child("remove_cell")
     add_cell_button = Gtk.Template.Child("add_cell")
 
+    right_revealer = Gtk.Template.Child("right_revealer")
+    left_revealer = Gtk.Template.Child("left_revealer")
+
     cell_type = None
 
     def __init__(self, cell_type, data=None, **kwargs):
         # add_shortcut_to_action(self, "<Shift>Return", "add.text")
         # add_shortcut_to_action(self, "<Ctrl>Return", "add.math")
-        add_shortcut_to_action(self, "<Shift>Return", "add.cell", GLib.Variant("(bb)", [False, True]))
-        add_shortcut_to_action(self, "<Ctrl>Return", "add.cell", GLib.Variant("(bb)", [True, False]))
-        add_shortcut_to_action(self, "<Ctrl><Shift>Return", "add.cell", GLib.Variant("(bb)", [False, False]))
+        add_shortcut_to_action(self, "<Shift>Return", "add.cell", GLib.Variant("(bb)", [False, False]))
+        add_shortcut_to_action(self, "<Ctrl>Return", "add.cell", GLib.Variant("(bb)", [True, True]))
+        add_shortcut_to_action(self, "<Ctrl><Shift>Return", "add.cell", GLib.Variant("(bb)", [False, True]))
         super().__init__(**kwargs)
         self.cell_type = cell_type
         if cell_type == CellType.MATH or cell_type == CellType.COMPUTATION:
@@ -64,7 +67,7 @@ class Cell(Adw.Bin):
             formulabox.viewport.get_child().connect("edit", self.on_edit)
             formulabox.viewport.get_child().connect("newline", self.add_cell_button_clicked, CellType.MATH)
             formulabox.viewport.get_child().connect("newline", self.run_calculation)
-            formulabox.viewport.get_child().connect("notify::has-focus", self.on_focus_change)
+            # formulabox.viewport.get_child().connect("notify::has-focus", self.on_editor_focus_change)
 
         elif cell_type == CellType.TEXT:
             # text editor implemented in an TextView
@@ -104,6 +107,11 @@ class Cell(Adw.Bin):
         self.remove_cell_button.connect("clicked", self.remove_cell_button_clicked)
         self.add_cell_button.connect("clicked", self.add_cell_button_clicked, CellType.MATH)
 
+        focus_controller = Gtk.EventControllerFocus.new()
+        focus_controller.connect("enter", self.on_focus_enter)
+        focus_controller.connect("leave", self.on_focus_leave)
+        self.add_controller(focus_controller)
+
 
     # Functions to abstract away getting and updating math expressions
     def get_expression(self):
@@ -124,10 +132,17 @@ class Cell(Adw.Bin):
         self.cell_type = CellType.COMPUTATION
         self.emit("calculate")
 
-    def on_focus_change(self, widget, _ = None):
-        # if a computation cell is defocused, recompute
-        if self.cell_type == CellType.COMPUTATION and widget.has_focus() == False:
+    def on_focus_enter(self, widget, _ = None):
+        self.right_revealer.set_reveal_child(True)
+        self.left_revealer.set_reveal_child(True)
+    def on_focus_leave(self, widget, _ = None):
+        self.right_revealer.set_reveal_child(False)
+        self.left_revealer.set_reveal_child(False)
+        if self.cell_type == CellType.COMPUTATION:
             self.emit("calculate")
+
+    # def on_editor_focus_change(self, widget, _ = None):
+        # if a computation cell is defocused, recompute
 
     def on_edit(self, _ = None):
         self.emit("edit")

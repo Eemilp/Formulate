@@ -10,26 +10,51 @@ template $Cell : Adw.Bin {
       CenterBox cell_centerbox {
         // styles: ["border"];
         [start]
+        Revealer left_revealer{
+        Box {
+          orientation: vertical;
         Button remove_cell {
           icon-name: "user-trash-symbolic";
           valign: start;
-          margin-start: 5;
-          margin-top: 5;
-          margin-end: 5;
-          margin-bottom: 5;
+          margin-start: 2;
+          margin-top: 2;
+          margin-end: 2;
+          margin-bottom: 2;
         }
-
-        // Center widget is put in code
-
-        [end]
         Adw.SplitButton add_cell {
           valign: end;
           icon-name: "list-add-symbolic";
-          margin-start: 5;
-          margin-top: 5;
-          margin-end: 5;
-          margin-bottom: 5;
+          margin-start: 2;
+          margin-top: 2;
+          margin-end: 2;
+          margin-bottom: 2;
           menu-model: add_cell_menu;
+        }
+        }
+        }
+
+        // Center widget is put in code
+        [end]
+        Revealer right_revealer{
+        Box {
+          orientation: vertical;
+        Button clear_cell {
+          icon-name: "edit-clear-symbolic";
+          valign: start;
+          margin-start: 2;
+          margin-top: 2;
+          margin-end: 2;
+          margin-bottom: 2;
+        }
+        Button run_cell {
+          icon-name: "media-playback-start-symbolic";
+          valign: start;
+          margin-start: 2;
+          margin-top: 2;
+          margin-end: 2;
+          margin-bottom: 2;
+        }
+        }
         }
       }
     // }
