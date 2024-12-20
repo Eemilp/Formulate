@@ -9,6 +9,10 @@
     <file preprocess="xml-stripblanks">gtk/help-overlay.ui</file>
     <file alias="style-dark.css">style-dark.css</file>
     <file alias="style.css">style.css</file>
+  <!-- </gresource> -->
+  <!-- <gresource prefix="/com/github/eemilp/Formulate/icons/hicolor/scalable/actions/"> -->
+    <file preprocess="xml-stripblanks">../data/icons/hicolor/scalable/actions/text-math-change-symbolic.svg</file>
   </gresource>
 </gresources>
+
 

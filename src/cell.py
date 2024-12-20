@@ -154,9 +154,9 @@ class Cell(Adw.Bin):
 
     def on_edit(self, _ = None):
         if self.get_cell_content() == "":
-            self.add_cell_button.set_label("Type")
+            self.add_cell_button.set_icon_name("text-math-change-symbolic")
         else:
-            self.add_cell_button.set_label("Add")
+            self.add_cell_button.set_icon_name("list-add-symbolic")
         self.emit("edit")
 
     def get_editor(self):
