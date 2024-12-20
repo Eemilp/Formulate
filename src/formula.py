@@ -186,7 +186,7 @@ class Editor(Gtk.DrawingArea):
             self.queue_draw()
             self.emit("edit")
             return
-        if char in "!'.,":
+        if char in "!'.,:":
             translation = str.maketrans("'", "′")
             self.cursor.insert(Atom(char.translate(translation)))
             self.queue_draw()

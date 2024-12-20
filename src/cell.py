@@ -65,11 +65,11 @@ class Cell(Adw.Bin):
         add_math_action = Gio.SimpleAction(
             name="add_math",
         )
-        add_math_action.connect("activate", self.add_cell, CellType.MATH)
+        add_math_action.connect("activate", self.add_cell_or_change_type, CellType.MATH)
         add_text_action = Gio.SimpleAction(
             name="add_text",
         )
-        add_text_action.connect("activate", self.add_cell, CellType.TEXT)
+        add_text_action.connect("activate", self.add_cell_or_change_type, CellType.TEXT)
         run_action = Gio.SimpleAction(
             name="run"
         )
@@ -109,7 +109,7 @@ class Cell(Adw.Bin):
             self.cell_centerbox.set_center_widget(formulabox)
 
             formulabox.viewport.get_child().connect("edit", self.on_edit)
-            formulabox.viewport.get_child().connect("newline", self.add_cell_button_clicked, CellType.MATH)
+            formulabox.viewport.get_child().connect("newline", self.add_cell, CellType.MATH)
 
         elif cell_type == CellType.TEXT:
             # text editor implemented in an TextView
@@ -140,8 +140,9 @@ class Cell(Adw.Bin):
             return ""
 
     def run_calculation(self, widget = None, _ = None):
-        self.cell_type = CellType.COMPUTATION
-        self.emit("calculate")
+        if self.cell_type != CellType.TEXT:
+            self.cell_type = CellType.COMPUTATION
+            self.emit("calculate")
 
     def on_focus_enter(self, widget, _ = None):
         self.right_revealer.set_reveal_child(True)
@@ -184,7 +185,7 @@ class Cell(Adw.Bin):
             return "";
 
     def add_and_run(self, widget, _):
-        self.add_cell_button_clicked(self)
+        self.emit("add_cell_below", int(CellType.MATH))
         if self.cell_type != CellType.TEXT:
             self.run_calculation()
 
@@ -197,17 +198,20 @@ class Cell(Adw.Bin):
     # Essentially passing through button signals
     def add_cell_button_clicked(self, widget, _ = None, data=CellType.MATH):
         if self.get_cell_content() == "":
-            widget.popup()
+            self.add_cell_button.popup()
         else:
             self.add_cell(widget, _, data)
 
-    def add_cell(self, widget, _ = None, data=CellType.MATH):
+    def add_cell_or_change_type(self, widget, _ = None, data=CellType.MATH):
         if self.get_cell_content() == "":
             self.cell_centerbox.set_center_widget(None)
             self.create_editor(data)
             self.get_editor().grab_focus()
         else:
-            self.emit("add_cell_below", int(data))
+            self.add_cell(widget, _, data)
+
+    def add_cell(self, widget, _ = None, data=CellType.MATH):
+        self.emit("add_cell_below", int(data))
 
     def remove_cell_button_clicked(self, widget):
         self.emit("remove_cell")
