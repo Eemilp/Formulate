@@ -110,19 +110,21 @@ class Document(Gtk.Box):
         new_cell.connect("remove_cell", self.remove_cell)
         new_cell.connect("edit", self.on_edit)
 
-        cell_editor = new_cell.get_editor()
-
         if type(pos) is Cell:
             index = pos.get_parent().get_index() + 1
             self.cells.insert(new_cell, index)
         else:
             self.cells.append(new_cell)
 
-        # row = new_cell.get_parent()
-
         self.edited = True
 
-        cell_editor.grab_focus()
+        # Grabbing focus done after some time as this can mess with scrolling
+        GLib.timeout_add(20, self.on_new_cell_drawn, new_cell)
+
+    def on_new_cell_drawn(self, cell):
+        editor = cell.get_editor()
+        editor.grab_focus()
+        return False
 
     def row_selected(self, _, row):
         editor = row.get_child().get_editor()
