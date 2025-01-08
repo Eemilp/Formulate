@@ -9,6 +9,7 @@ template $Cell : Adw.Bin {
         // styles: ["border"];
         [start]
         Revealer left_revealer{
+          transition-type: slide_left;
         Box {
           orientation: vertical;
         Button remove_cell {
@@ -34,6 +35,7 @@ template $Cell : Adw.Bin {
         // Center widget is put in code
         [end]
         Revealer right_revealer{
+          transition-type: slide_right;
         Box {
           orientation: vertical;
         Button clear_cell {

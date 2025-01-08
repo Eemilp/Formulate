@@ -103,6 +103,8 @@ class Cell(Adw.Bin):
 
     def create_editor(self, cell_type, data = None):
         self.cell_type = cell_type
+        if data != None and data != "":
+            self.add_cell_button.set_icon_name("list-add-symbolic")
         if cell_type == CellType.MATH or cell_type == CellType.COMPUTATION:
             # add one formulabox for now
             formulabox = FormulaBox(data)
