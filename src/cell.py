@@ -28,9 +28,9 @@ from enum import IntEnum
 
 # different types of cells
 class CellType(IntEnum):
-    MATH = 0
-    TEXT = 1
-    COMPUTATION = 2
+    MATH = 1
+    TEXT = 2
+    COMPUTATION = 3
 
 @Gtk.Template(resource_path='/com/github/eemilp/Formulate/cell.ui')
 class Cell(Adw.Bin):
