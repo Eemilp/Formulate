@@ -8,4 +8,5 @@
 
 .cell_list {
     background-color: @window_bg_color;
+    padding-bottom: 200px;
 }
