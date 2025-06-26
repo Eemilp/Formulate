@@ -57,3 +57,5 @@ class Sum(element.Element):
             return r"\sum_{" + self.bottom.to_str() + "}^{" + self.top.to_str() + "}"
         elif self.char == "∏":
             return r"\prod_{" + self.bottom.to_str() + "}^{" + self.top.to_str() + "}"
+
+    # TODO dump method

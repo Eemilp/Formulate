@@ -18,10 +18,10 @@ def name_to_element(name):
         return radical.Radical([])
     elif name == 'nthroot':
         return radical.Radical([], index=[])
-    elif name == 'sum':
-        return sum.Sum()
-    elif name == 'prod':
-        return sum.Sum(char="∏")
+    # elif name == 'sum':
+        # return sum.Sum()
+    # elif name == 'prod':
+        # return sum.Sum(char="∏")
     elif name == 'floor':
         return floor.Floor([])
     elif name == 'ceil':

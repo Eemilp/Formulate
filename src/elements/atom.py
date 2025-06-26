@@ -39,6 +39,13 @@ class BaseAtom(element.Element):
     def to_str(self):
         return deitalify_string(self.name)
 
+    def dump(self):
+        return {
+            self.__class__.__name__: {
+                "name": deitalify_string(self.name) # TODO this might cause problems
+            }
+        }
+
 class Atom(BaseAtom):
     def __init__(self, name, parent=None):
         super().__init__(italify_string(name), parent=parent)

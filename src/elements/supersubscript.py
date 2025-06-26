@@ -111,3 +111,11 @@ class SuperscriptSubscript(element.Element):
         if self.exponent is not None:
             res += "^(" + self.exponent.to_str() + ")"
         return res
+
+    def dump(self):
+        return {
+            self.__class__.__name__: {
+                "exponent": self.exponent.dump() if self.exponent is not None else None,
+                "subscript": self.subscript.dump() if self.subscript is not None else None,
+            }
+        }

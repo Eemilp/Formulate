@@ -60,3 +60,10 @@ sandwiched between two characters (e.g. Abs, Floor, Ceil).
 
     def to_str(self):
         return rf"{self.class_name.lower()}({self.argument.to_latex()})"
+
+    def dump(self):
+        return {
+            self.__class__.__name__: {
+                "argument": self.argument.dump()
+            }
+        }

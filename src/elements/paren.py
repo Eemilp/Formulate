@@ -100,6 +100,13 @@ class Paren(element.Element):
     def to_str(self):
         return self.char
 
+    def dump(self):
+        return {
+            self.__class__.__name__: {
+                "char": self.char,
+            }
+        }
+
     @classmethod
     def is_paren(cls, element, left=None):
         if not isinstance(element, cls):

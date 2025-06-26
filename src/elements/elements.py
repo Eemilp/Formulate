@@ -349,6 +349,15 @@ class ElementList(abstractelement.AbstractElement):
         return "".join(e.to_str() for e in self.elements)
 
 
+    def dump(self):
+        return {
+            self.__class__.__name__: {
+                "elements": [e.dump() for e in self.elements] if self.elements is not None else None
+            }
+        }
+
+
+
 from . import sum
 from . import paren
 from . import radical

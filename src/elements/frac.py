@@ -66,3 +66,11 @@ class Frac(element.Element):
 
     def to_str(self):
         return "(" + self.numerator.to_str() + ")/(" + self.denominator.to_str() + ")"
+
+    def dump(self):
+        return {
+            self.__class__.__name__: {
+                "numerator": self.numerator.dump(),
+                "denominator": self.denominator.dump(),
+            }
+        }

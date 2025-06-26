@@ -83,3 +83,11 @@ class Radical(element.Element):
             return "sqrt(" + self.radicand.to_str() + "," + self.index.to_str() + ")"
         else:
             return "sqrt(" + self.radicand.to_str() + ")"
+
+    def dump(self):
+        return {
+            self.__class__.__name__: {
+                "radicand": self.radicand.dump(),
+                "index": self.index.dump() if self.index is not None else None
+            }
+        }
