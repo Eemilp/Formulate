@@ -38,17 +38,13 @@ template $FormulateWindow : Adw.ApplicationWindow {
         tooltip-text: _("Save");
       }
     }
-    Box {
-      orientation: vertical;
-
-      Adw.TabBar {
-        view: tabs;
-      }
-
-      Adw.TabView tabs {
-        vexpand: true;
-      }
+    [top]
+    Adw.TabBar {
+      view: tabs;
     }
+    Adw.TabView tabs {
+      vexpand: true;
+      }
   };
 }
 
