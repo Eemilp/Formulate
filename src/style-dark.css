@@ -3,10 +3,12 @@
 /* } */
 
 .textbox {
-    border-radius: 8px;
+    background-color: transparent;
+    font-size: 18pt;
+    font-family: "Latin Modern Math";
 }
 
 .cell_list {
-    background-color: @window_bg_color;
-    padding-bottom: 200px;
+    background-color: transparent;
+    /* padding-bottom: 200px; */
 }
