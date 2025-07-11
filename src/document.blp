@@ -1,14 +1,16 @@
 using Gtk 4.0;
 using Adw 1;
 
-template $Document : Gtk.Box {
+template $Document : Adw.Bin {
       halign: fill;
       Adw.ToastOverlay toast_overlay {
         ScrolledWindow scrolled_window {
+          Adw.Clamp{
           ListBox cells {
             styles ["cell_list"]
             selection-mode: none;
             hexpand: true;
+          }
           }
         }
       }

@@ -25,11 +25,14 @@ import lark.exceptions
 from . import parser
 
 @Gtk.Template(resource_path='/com/github/eemilp/Formulate/formulabox.ui')
-class FormulaBox(Gtk.Box):
+class FormulaBox(Adw.Bin):
     __gtype_name__ = 'FormulaBox'
 
     viewport = Gtk.Template.Child("editor_viewport")
-    editor_label = Gtk.Template.Child("editor_text")
+    result_label = Gtk.Template.Child("result_text")
+
+    revealer = Gtk.Template.Child("long_text_revealer")
+    long_label = Gtk.Template.Child("long_text")
 
     def __init__(self, latex_expr = None, **kwargs):
         super().__init__(**kwargs)
@@ -44,22 +47,24 @@ class FormulaBox(Gtk.Box):
 
         editor = Editor(elements)
         self.viewport.set_child(editor)
-        # editor.connect("calculate", self.on_formula_updated, editor)
 
     def get_expression(self):
         return self.viewport.get_child().expr.to_str()
 
     def update_label(self, next_label):
-        self.editor_label.set_selectable(True)
+        self.result_label.set_selectable(True)
         # if there is an = sign, use an arrow for more beautiful notation
         if next_label is None:
             self.editor_label.set_label("")
         elif('=' in self.viewport.get_child().expr.to_str()):
             formatted_label = "<span font='Latin Modern Math 18'>→ " + next_label + "</span>"
-            self.editor_label.set_label(formatted_label)
+            self.result_label.set_label(formatted_label)
         else:
             formatted_label = "<span font='Latin Modern Math 18'>= " + next_label + "</span>"
-            self.editor_label.set_label(formatted_label)
+            self.result_label.set_label(formatted_label)
 
     def get_label(self):
-        return self.editor_label.get_label()[34:][:-7]
+        return self.result_label.get_label()[34:][:-7]
+
+    def show_evaluated(self, show):
+        self.revealer.set_reveal_child(show)

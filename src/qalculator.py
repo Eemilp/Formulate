@@ -26,9 +26,13 @@ class Qalculator(object):
         # qalc_terse = lambda e: run(['qalc', '-t', e], capture_output=True).stdout.decode('UTF-8').strip()
         pass
 
-    def qalculate(self, expr):
+    def qalculate(self, expr, long = False):
         #return run(['qalc' ,'-t -f', '<(printf "' + expr, '")'], shell = True, capture_output=True).stdout.decode('UTF-8').strip()
-        self.process = Popen(['qalc', '-t', '-f', '-'],
+        if long:
+            opts = []
+        else:
+            opts = ['-t']
+        self.process = Popen(['qalc', '-f', '-'] + opts,
         stdin=PIPE,             # Connect to stdin
         stdout=PIPE,            # Connect to stdout
         #stderr=PIPE,            # Connect to stderr (optional)

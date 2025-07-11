@@ -1,8 +1,15 @@
 using Gtk 4.0;
 using Adw 1;
 
-template $FormulaBox : Adw.Bin {
-  content: Gtk.Box {
+template $MathCell : $Cell {
+  Gtk.Box {
+    orientation: horizontal;
+    Gtk.Image {
+      icon-name: "list-drag-handle-symbolic";
+      opacity: 0.5;
+    }
+
+  Gtk.Box {
     orientation: vertical;
     valign: center;
     halign: center;
@@ -23,9 +30,12 @@ template $FormulaBox : Adw.Bin {
     }
     Gtk.Revealer long_text_revealer {
       Gtk.Label long_text {
-        label: "Result text placeholder";
+        label: "";
         opacity: 0.5;
+        wrap: true;
+        wrap-mode: word;
       }
     }
-  };
+  }
+  }
 }

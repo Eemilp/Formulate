@@ -1,75 +1,33 @@
 using Gtk 4.0;
 using Adw 1;
 
-template $Cell : Adw.Bin {
+template $Cell : Gtk.ListBoxRow {
   margin-start: 10;
   margin-end: 10;
-  Adw.Clamp clamp { //Why on earth is the clamp class final???
-      CenterBox cell_centerbox {
-        // styles: ["border"];
-        [start]
-        Revealer left_revealer{
-          transition-type: slide_left;
-        Box {
-          orientation: vertical;
-        Button remove_cell {
-          icon-name: "user-trash-symbolic";
-          valign: start;
-          margin-start: 2;
-          margin-top: 2;
-          margin-end: 5;
-          margin-bottom: 2;
-        }
-        Adw.SplitButton add_cell {
-          valign: end;
-          icon-name: "text-math-change-symbolic";
-          margin-start: 2;
-          margin-top: 2;
-          margin-end: 5;
-          margin-bottom: 2;
-          menu-model: add_cell_menu;
-        }
-        }
-        }
-
-        // Center widget is put in code
-        [end]
-        Revealer right_revealer{
-          transition-type: slide_right;
-        Box {
-          orientation: vertical;
-        Button clear_cell {
-          icon-name: "edit-clear-symbolic";
-          valign: start;
-          margin-start: 5;
-          margin-top: 2;
-          margin-end: 2;
-          margin-bottom: 2;
-        }
-        Button run_cell {
-          icon-name: "media-playback-start-symbolic";
-          valign: start;
-          margin-start: 5;
-          margin-top: 2;
-          margin-end: 2;
-          margin-bottom: 2;
-        }
-        }
-        }
+  Gtk.Box { //TODO this should probably be inside DragIcon
+    orientation: horizontal;
+    Gtk.Image {
+      icon-name: "list-drag-handle-symbolic";
+      opacity: 0.5;
+    }
+    Adw.Clamp {
+      Adw.Bin cell_content {
+      //holds the cell content
       }
+    }
   }
 }
 
-menu add_cell_menu {
-  section{
-    item {
-      label: "Math";
-      action: "cell.add_math";
-    }
-    item {
-      label: "Text";
-      action: "cell.add_text";
-    }
-  }
-}
+// menu add_cell_menu {
+//   section{
+//     item {
+//       label: "Math";
+//       action: "cell.add_math";
+//     }
+//     item {
+//       label: "Text";
+//       action: "cell.add_text";
+//     }
+//   }
+// }
 

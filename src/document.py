@@ -20,15 +20,14 @@
 from gi.repository import Adw
 from gi.repository import Gtk
 from gi.repository import Gio, GLib, GObject
-from .formulabox import FormulaBox
 from .qalculator import Qalculator
-from .cell import Cell, CellType
+from .cells import Cell, CellType, create_cell
 from .converter import *
 import json # for saving and loading
 from collections import deque
 
 @Gtk.Template(resource_path='/com/github/eemilp/Formulate/document.ui')
-class Document(Gtk.Box):
+class Document(Adw.Bin):
     __gtype_name__ = 'Document'
     __gsignals__ = {
         'file_opened' : (GObject.SignalFlags.RUN_LAST, None, ()),
@@ -38,12 +37,14 @@ class Document(Gtk.Box):
     qalc = Qalculator()
 
     cells = Gtk.Template.Child("cells")
-    toast_overlay = Gtk.Template.Child("toast_overlay")
+    # toast_overlay = Gtk.Template.Child("toast_overlay")
 
-    cell_history = deque()
+    # cell_history = deque()
 
     file = None
     edited = False
+
+    recompute = False
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -72,22 +73,24 @@ class Document(Gtk.Box):
 
     def remove_cell(self, cell):
         # undo toast
-        toast = Adw.Toast.new("Deleted cell")
-        toast.set_button_label("Undo")
-        toast.set_priority(1) #high prio
-        toast.connect("dismissed", self.dismissed_undo_toast)
-        toast.connect("button_clicked", self.toast_undo)
-        self.toast_overlay.add_toast(toast)
+        # toast = Adw.Toast.new("Deleted cell")
+        # toast.set_button_label("Undo")
+        # toast.set_priority(1) #high prio
+        # toast.connect("dismissed", self.dismissed_undo_toast)
+        # toast.connect("button_clicked", self.toast_undo)
+        # self.toast_overlay.add_toast(toast)
 
-        pos = cell.get_parent().get_index()
+        # pos = cell.get_index()
 
-        self.cells.remove(cell.get_parent())
-        self.cell_history.append({'pos':pos, 'cell':cell})
+        self.cells.remove(cell)
+        # self.cell_history.append({'pos':pos, 'cell':cell})
+
+        # TODO focus on previous cell/next cell when removed
 
         self.edited = True
 
         # if computation we need to recompute to not have internal state
-        if cell.cell_type == CellType.COMPUTATION:
+        if cell.get_type() == CellType.COMPUTATION:
             self.run_calculation()
 
     def toast_undo(self, _ = None):
@@ -97,21 +100,21 @@ class Document(Gtk.Box):
         self.cells.insert(cell, pos)
 
         # if computation we need to recompute to not have internal state
-        if cell.cell_type == CellType.COMPUTATION:
+        if cell.get_type() == CellType.COMPUTATION:
             self.run_calculation()
 
-    def dismissed_undo_toast(self, _ = None):
-        self.cell_history.pop()
+    # def dismissed_undo_toast(self, _ = None):
+        # self.cell_history.pop()
 
     def add_cell(self, pos=None, cell_type = CellType.TEXT, cell_data = None):
-        new_cell = Cell(cell_type, cell_data)
+        new_cell = create_cell(cell_type, cell_data)
         new_cell.connect("calculate", self.run_calculation)
         new_cell.connect("add_cell_below", self.add_cell)
         new_cell.connect("remove_cell", self.remove_cell)
         new_cell.connect("edit", self.on_edit)
 
-        if type(pos) is Cell:
-            index = pos.get_parent().get_index() + 1
+        if issubclass(type(pos), Cell):
+            index = pos.get_index() + 1
             self.cells.insert(new_cell, index)
         else:
             self.cells.append(new_cell)
@@ -127,15 +130,17 @@ class Document(Gtk.Box):
         return False
 
     def row_selected(self, _, row):
-        editor = row.get_child().get_editor()
-        row.get_child().get_editor().grab_focus()
+        editor = row.get_editor()
+        row.get_editor().grab_focus()
 
-    def on_edit(self, _widget = None):
+    def on_edit(self, widget = None):
         self.edited = True
+        if widget.get_type() == CellType.COMPUTATION:
+            self.recompute = True
 
     def run_calculation(self, _widget = None):
-        cells = [c.get_child() for c in self.cells][:-1] #Due to last element being status page
-        computed_cells = [c for c in cells if c.cell_type == CellType.COMPUTATION]
+        cells = [c for c in self.cells][:-1] #Due to last element being status page
+        computed_cells = [c for c in cells if c.get_type() == CellType.COMPUTATION]
 
         # get all expressions in the document
         expressions = [c.get_expression() for c in computed_cells]
@@ -143,13 +148,41 @@ class Document(Gtk.Box):
         # Empty rows get discarded by qalc -> empty rows replaced by zero
         expressions = ['0' if e == '' else e for e in expressions]
 
+        # Creatio Gio task
+        task = Gio.Task.new(self, None, self.run_calculation_complete, None)
+        task.expressions = expressions # Pass expressions onto bg task
+        task.computed_cells = computed_cells
+
+        # Mark recompute false
+        self.recompute = False
+
+        # Launch calculation
+        task.run_in_thread(self.run_calculation_background)
+
+    def run_calculation_background(self, task, _1, _2, _3):
+        expressions = task.expressions
+
         # calculate the results
         result_string = self.qalc.qalculate('\n'.join(expressions))
         results = result_string.split('\n') #! note last element empty
+        task.results = results
+
+        # calculate the interpretations
+        interp_string = self.qalc.qalculate('\n'.join(expressions), True)
+        interps = interp_string.split('\n') #! note last element empty
+        task.interps = interps
+
+        task.return_boolean(True)
+
+    def run_calculation_complete(self, widget, task, _):
+        results = task.results
+        interps = task.interps
+        computed_cells = task.computed_cells
 
         # update labels
-        for (c, r) in zip(computed_cells, results):
+        for (c, r, i) in zip(computed_cells, results, interps):
             c.update_result(r)
+            c.update_interpretation(i)
 
     def empty(self):
         return len([0 for c in self.cells]) == 1 and self.file == None
@@ -158,8 +191,8 @@ class Document(Gtk.Box):
         return self.file.get_basename() if self.file is not None else "Untitled"
 
     def save_file(self, file):
-        cells = [c.get_child() for c in self.cells][:-1] #Due to last element being status page
-        cell_data = [dict(type=c.cell_type, content=c.get_cell_content()) for c in cells]
+        cells = [c for c in self.cells][:-1] #Due to last element being status page
+        cell_data = [dict(type=c.get_type(), content=c.get_cell_content()) for c in cells]
         data = dict(version="0.2.0", cells=cell_data)
         data_str = json.dumps(data)
         bytes = GLib.Bytes.new(data_str.encode('utf-8'))
@@ -199,6 +232,7 @@ class Document(Gtk.Box):
         if not contents[0]:
             path = file.peek_path()
             print(f"Unable to open {path}: {contents[1]}")
+            return #TODO check this
 
         decoded = contents[1].decode('utf-8')
         data = json.loads(decoded)
@@ -219,12 +253,12 @@ class Document(Gtk.Box):
         self.run_calculation()
 
     def export_file(self, file, type = 'md'):
-        cells = [c.get_child() for c in self.cells][:-1] #Due to Empty last element
+        cells = [c for c in self.cells][:-1] #Due to Empty last element
 
         def get_md(c):
-            if c.cell_type == CellType.MATH:
+            if c.get_type() == CellType.MATH:
                 return '$$\n' + c.get_cell_content() + '\n$$'
-            elif c.cell_type == CellType.COMPUTATION:
+            elif c.get_type() == CellType.COMPUTATION:
                 return '$$\n' + c.get_cell_content() + ' ' + c.get_result() + '\n$$'
             else:
                 return c.get_cell_content()
@@ -255,4 +289,6 @@ class Document(Gtk.Box):
             display_name = file.get_basename()
         if not res:
             print(f"Unable to save {display_name}")
+
+
 

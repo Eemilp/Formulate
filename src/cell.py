@@ -7,7 +7,7 @@
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# This program is distributed in the hope that it will be useful,
+# This program is distributed in the hope that it will be useful,/home/eemil/Projects/Formulate/src/cell.py
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
@@ -33,7 +33,7 @@ class CellType(IntEnum):
     COMPUTATION = 3
 
 @Gtk.Template(resource_path='/com/github/eemilp/Formulate/cell.ui')
-class Cell(Adw.Bin):
+class Cell(Gtk.ListBoxRow):
     __gtype_name__ = 'Cell'
     __gsignals__ = {
         'add_cell_below': (GObject.SignalFlags.RUN_LAST, None, (int,)),
@@ -42,14 +42,9 @@ class Cell(Adw.Bin):
         'edit' : (GObject.SignalFlags.RUN_LAST, None, ()),
     }
 
-    cell_centerbox = Gtk.Template.Child("cell_centerbox")
-    remove_cell_button = Gtk.Template.Child("remove_cell")
-    add_cell_button = Gtk.Template.Child("add_cell")
-    run_cell_button = Gtk.Template.Child("run_cell")
-    clear_cell_button = Gtk.Template.Child("clear_cell")
-
-    right_revealer = Gtk.Template.Child("right_revealer")
-    left_revealer = Gtk.Template.Child("left_revealer")
+    # run_cell_button = Gtk.Template.Child("run_cell")
+    # clear_cell_button = Gtk.Template.Child("clear_cell")
+    cell_content = Gtk.Template.Child("cell_content")
 
     cell_type = None
 
@@ -91,10 +86,9 @@ class Cell(Adw.Bin):
         cell_menu_group.add_action(clear_action)
         self.insert_action_group("cell", cell_menu_group)
 
-        self.remove_cell_button.connect("clicked", self.remove_cell_button_clicked)
-        self.add_cell_button.connect("clicked", self.add_cell_button_clicked, CellType.MATH)
-        self.run_cell_button.connect("clicked", lambda *_: self.run_calculation())
-        self.clear_cell_button.connect("clicked", self.clear_calculation)
+        # self.add_cell_button.connect("clicked", self.add_cell_button_clicked, CellType.MATH)
+        # self.run_cell_button.connect("clicked", lambda *_: self.run_calculation())
+        # self.clear_cell_button.connect("clicked", self.clear_calculation)
 
         focus_controller = Gtk.EventControllerFocus.new()
         focus_controller.connect("enter", self.on_focus_enter)
@@ -108,7 +102,7 @@ class Cell(Adw.Bin):
         if cell_type == CellType.MATH or cell_type == CellType.COMPUTATION:
             # add one formulabox for now
             formulabox = FormulaBox(data)
-            self.cell_centerbox.set_center_widget(formulabox)
+            self.cell_content.set_child(formulabox)
 
             formulabox.viewport.get_child().connect("edit", self.on_edit)
             formulabox.viewport.get_child().connect("newline", self.add_cell, CellType.MATH)
@@ -116,7 +110,7 @@ class Cell(Adw.Bin):
         elif cell_type == CellType.TEXT:
             # text editor implemented in an TextView
             textbox = TextBox()
-            self.cell_centerbox.set_center_widget(textbox)
+            self.cell_content.set_child(textbox)
 
             buffer = textbox.textview.get_buffer()
             buffer.connect("changed", self.on_edit)
@@ -129,52 +123,51 @@ class Cell(Adw.Bin):
     # Functions to abstract away getting and updating math expressions
     def get_expression(self):
         if self.cell_type == CellType.COMPUTATION:
-            return self.cell_centerbox.get_center_widget().get_expression()
+            return self.cell_content.get_child().get_expression()
         else:
             return None
+
     def update_result(self, result):
         if self.cell_type == CellType.COMPUTATION:
-            self.cell_centerbox.get_center_widget().update_label(result)
+            self.cell_content.get_child().update_label(result)
+
     def get_result(self):
         if self.cell_type == CellType.COMPUTATION:
-            return self.cell_centerbox.get_center_widget().get_label()
+            return self.cell_content.get_child().get_label()
         else:
             return ""
 
     def run_calculation(self, widget = None, _ = None):
         if self.cell_type != CellType.TEXT:
             self.cell_type = CellType.COMPUTATION
+            self.cell_content.get_child().show_evaluated(True)
             self.emit("calculate")
 
     def on_focus_enter(self, widget, _ = None):
-        self.right_revealer.set_reveal_child(True)
-        self.left_revealer.set_reveal_child(True)
-    def on_focus_leave(self, widget, _ = None):
-        self.right_revealer.set_reveal_child(False)
-        self.left_revealer.set_reveal_child(False)
         if self.cell_type == CellType.COMPUTATION:
+            self.cell_content.get_child().show_evaluated(True)
+
+    def on_focus_leave(self, widget, _ = None):
+        if self.cell_type == CellType.COMPUTATION:
+            self.cell_content.get_child().show_evaluated(False)
             self.emit("calculate")
 
     def on_edit(self, _ = None):
-        if self.get_cell_content() == "":
-            self.add_cell_button.set_icon_name("text-math-change-symbolic")
-        else:
-            self.add_cell_button.set_icon_name("list-add-symbolic")
         self.emit("edit")
 
     def get_editor(self):
         if self.cell_type == CellType.MATH or self.cell_type == CellType.COMPUTATION:
-            return self.cell_centerbox.get_center_widget().viewport.get_child()
+            return self.cell_content.get_child().viewport.get_child()
         else:
-            return self.cell_centerbox.get_center_widget().get_child()
+            return self.cell_content.get_child().get_child()
 
     def get_cell_content(self):
         if self.cell_type == CellType.MATH or self.cell_type == CellType.COMPUTATION:
-            expr = self.cell_centerbox.get_center_widget().viewport.get_child().expr
+            expr = self.cell_content.get_child().viewport.get_child().expr
             return expr.to_latex()
         if self.cell_type == CellType.TEXT:
             # Essentially copied from gnome documentation:
-            buffer = self.cell_centerbox.get_center_widget().textview.get_buffer()
+            buffer = self.cell_content.get_child().textview.get_buffer()
             # Retrieve the iterator at the start of the buffer
             start = buffer.get_start_iter()
             # Retrieve the iterator at the end of the buffer
@@ -197,16 +190,9 @@ class Cell(Adw.Bin):
            self.cell_type = CellType.MATH
            self.emit("calculate")
 
-    # Essentially passing through button signals
-    def add_cell_button_clicked(self, widget, _ = None, data=CellType.MATH):
-        if self.get_cell_content() == "":
-            self.add_cell_button.popup()
-        else:
-            self.add_cell(widget, _, data)
-
     def add_cell_or_change_type(self, widget, _ = None, data=CellType.MATH):
         if self.get_cell_content() == "":
-            self.cell_centerbox.set_center_widget(None)
+            self.cell_content.set_child(None)
             self.create_editor(data)
             self.get_editor().grab_focus()
         else:
@@ -215,5 +201,6 @@ class Cell(Adw.Bin):
     def add_cell(self, widget, _ = None, data=CellType.MATH):
         self.emit("add_cell_below", int(data))
 
-    def remove_cell_button_clicked(self, widget):
-        self.emit("remove_cell")
+    # def remove_cell_button_clicked(self, widget):
+        # self.emit("remove_cell")
+

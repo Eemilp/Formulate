@@ -1,7 +1,13 @@
 using Gtk 4.0;
 using Adw 1;
 
-template $TextBox : Adw.Bin {
+template $TextCell : $Cell {
+  Gtk.Box {
+    orientation: horizontal;
+    Gtk.Image {
+      icon-name: "list-drag-handle-symbolic";
+      opacity: 0.5;
+    }
       TextView textview {
         styles ["textbox"]
         hexpand: true;
@@ -12,6 +18,7 @@ template $TextBox : Adw.Bin {
         accepts-tab: false;
         editable: true;
         cursor-visible: true;
-        wrap-mode: char;
+        wrap-mode: word;
       }
+  }
 }

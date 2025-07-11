@@ -37,6 +37,7 @@ class Editor(Gtk.DrawingArea):
     __gsignals__ = {
         'edit': (GObject.SignalFlags.RUN_LAST, None, ()),
         'newline': (GObject.SignalFlags.RUN_LAST, None, ()),
+        'delete': (GObject.SignalFlags.RUN_LAST, None, ()),
         'cursor_position': (GObject.SignalFlags.RUN_FIRST, None, (float, float)),
     }
     def __init__(self, expression=None):
@@ -198,11 +199,15 @@ class Editor(Gtk.DrawingArea):
             self.emit("edit")
             return
         if keyval == Gdk.KEY_BackSpace:
+            if self.expr.to_str() == "":
+                self.emit("delete")
             self.cursor.backspace(Direction.LEFT)
             self.queue_draw()
             self.emit("edit")
             return
         if keyval == Gdk.KEY_Delete:
+            if self.expr.to_str() == "":
+                self.emit("delete")
             self.cursor.backspace(Direction.RIGHT)
             self.queue_draw()
             self.emit("edit")
