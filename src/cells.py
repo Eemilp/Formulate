@@ -155,7 +155,9 @@ class MathCell(Cell):
         return self.editor.expr.to_latex() + self.result_label.get_label()
     def get_content(self):
         # JSON
-        pass
+        expression = self.editor.expr
+        expr_dict = expression.dump()
+        return expr_dict
 
     def get_editor(self):
         return self.editor
@@ -180,7 +182,6 @@ class MathCell(Cell):
             self.long_label.set_label(interp)
 
     def on_add_and_run(self, widget, _ = None):
-        print("called")
         self.on_calculate(None)
         self.on_add_math(None)
 
@@ -218,18 +219,18 @@ class TextCell(Cell):
         add_shortcut_to_action(self, "<Shift>Return", "cell.add_math")
         super().__init__(**kwargs)
 
+        # TODO load files
+
         self.editor.connect("backspace", self.on_backspace)
         self.buffer = self.editor.get_buffer()
         self.buffer.connect("changed", self.on_edit)
-
-        self.queue_resize()
 
     def get_type(self):
         return CellType.TEXT
 
     def get_latex(self):
         # Essentially copied from gnome documentation:
-        buffer = self.cell_content.get_child().textview.get_buffer()
+        buffer = self.editor.get_buffer()
         # Retrieve the iterator at the start of the buffer
         start = buffer.get_start_iter()
         # Retrieve the iterator at the end of the buffer
@@ -238,8 +239,8 @@ class TextCell(Cell):
         text = buffer.get_text(start, end, False)
         return text
     def get_content(self):
-        # JSON
-        pass
+        # Just returns the content of the cell. Same as latex
+        return self.get_latex()
 
     def on_backspace(self, widget, _ = None):
         if self.buffer.get_char_count() == 0:

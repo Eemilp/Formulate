@@ -37,7 +37,7 @@ class Document(Adw.Bin):
     qalc = Qalculator()
 
     cells = Gtk.Template.Child("cells")
-    # toast_overlay = Gtk.Template.Child("toast_overlay")
+    toast_overlay = Gtk.Template.Child("toast_overlay")
 
     # cell_history = deque()
 
@@ -80,12 +80,15 @@ class Document(Adw.Bin):
         # toast.connect("button_clicked", self.toast_undo)
         # self.toast_overlay.add_toast(toast)
 
-        # pos = cell.get_index()
+        pos = cell.get_index()
 
         self.cells.remove(cell)
         # self.cell_history.append({'pos':pos, 'cell':cell})
 
-        # TODO focus on previous cell/next cell when removed
+        # focus on previous cell/next cell when removed
+        if len([0 for c in self.cells]) >= 2:
+            prev_cell = self.cells.get_row_at_index(pos - 1)
+            prev_cell.get_editor().grab_focus()
 
         self.edited = True
 
@@ -93,15 +96,15 @@ class Document(Adw.Bin):
         if cell.get_type() == CellType.COMPUTATION:
             self.run_calculation()
 
-    def toast_undo(self, _ = None):
-        cell = self.cell_history[-1]['cell']
-        pos = self.cell_history[-1]['pos']
+    # def toast_undo(self, _ = None):
+    #     cell = self.cell_history[-1]['cell']
+    #     pos = self.cell_history[-1]['pos']
 
-        self.cells.insert(cell, pos)
+    #     self.cells.insert(cell, pos)
 
         # if computation we need to recompute to not have internal state
-        if cell.get_type() == CellType.COMPUTATION:
-            self.run_calculation()
+    #     if cell.get_type() == CellType.COMPUTATION:
+    #         self.run_calculation()
 
     # def dismissed_undo_toast(self, _ = None):
         # self.cell_history.pop()
@@ -168,8 +171,10 @@ class Document(Adw.Bin):
         task.results = results
 
         # calculate the interpretations
-        interp_string = self.qalc.qalculate('\n'.join(expressions), True)
-        interps = interp_string.split('\n') #! note last element empty
+        # 0 = 0 is used as a split since qalculate gives sometimes warnings
+        # etc. on multiple lines. + is to remove one last newline.
+        interp_string = self.qalc.qalculate("\n0\n".join(expressions) + "\n0\n", True)
+        interps = interp_string.split("\n0 = 0\n") #! note last element empty
         task.interps = interps
 
         task.return_boolean(True)
@@ -192,7 +197,7 @@ class Document(Adw.Bin):
 
     def save_file(self, file):
         cells = [c for c in self.cells][:-1] #Due to last element being status page
-        cell_data = [dict(type=c.get_type(), content=c.get_cell_content()) for c in cells]
+        cell_data = [dict(type=c.get_type(), content=c.get_content()) for c in cells]
         data = dict(version="0.2.0", cells=cell_data)
         data_str = json.dumps(data)
         bytes = GLib.Bytes.new(data_str.encode('utf-8'))
@@ -257,11 +262,11 @@ class Document(Adw.Bin):
 
         def get_md(c):
             if c.get_type() == CellType.MATH:
-                return '$$\n' + c.get_cell_content() + '\n$$'
+                return '$$\n' + c.get_latex() + '\n$$'
             elif c.get_type() == CellType.COMPUTATION:
-                return '$$\n' + c.get_cell_content() + ' ' + c.get_result() + '\n$$'
+                return '$$\n' + c.get_latex() + ' ' + c.get_result() + '\n$$'
             else:
-                return c.get_cell_content()
+                return c.get_latex()
 
         lines = [get_md(c) for c in cells]
         data_str = '\n'.join(lines)
@@ -289,6 +294,3 @@ class Document(Adw.Bin):
             display_name = file.get_basename()
         if not res:
             print(f"Unable to save {display_name}")
-
-
-

@@ -111,6 +111,7 @@ class Editor(Gtk.DrawingArea):
             self.cursor.visible = True
         if self.blink_source:
             GLib.source_remove(self.blink_source)
+        self.queue_draw() # Redraw cursor immidiately
         self.blink_source = GLib.timeout_add(Cursor.BLINK_DELAY, self.blink_cursor_cb)
 
     def on_key_press(self, event_cont, keyval, keycode, state):
