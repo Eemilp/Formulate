@@ -94,7 +94,9 @@ class MathCell(Cell):
     viewport = Gtk.Template.Child("editor_viewport")
     result_label = Gtk.Template.Child("result_text")
     revealer = Gtk.Template.Child("long_text_revealer")
+    calculate_button_revealer = Gtk.Template.Child("calculate_button_revealer")
     long_label = Gtk.Template.Child("long_text")
+    calculate_button = Gtk.Template.Child("calculate_button")
 
     computation = False
 
@@ -139,6 +141,23 @@ class MathCell(Cell):
         self.focus_controller.connect("leave", self.on_focus_leave)
         self.add_controller(self.focus_controller)
 
+        # Button and revealer
+        self.calculate_button.connect("clicked",self.on_calculate_button_clicked)
+        if self.computation:
+            self.set_button_clear()
+        else:
+            self.set_button_calculate()
+
+    def set_button_clear(self):
+        self.calculate_button.set_icon_name("edit-clear-symbolic")
+    def set_button_calculate(self):
+        self.calculate_button.set_icon_name("media-playback-start")
+    def on_calculate_button_clicked(self, widget):
+        if self.computation:
+            self.clear(self.calculate_button)
+        else:
+            self.on_calculate(self.calculate_button)
+
     def get_type(self):
         if self.computation:
             return CellType.COMPUTATION
@@ -174,7 +193,6 @@ class MathCell(Cell):
             formatted_label = "<span font='Latin Modern Math 18'>= " + result + "</span>"
             self.result_label.set_label(formatted_label)
 
-    #TODO update long text label
     def update_interpretation(self, interp):
         if interp is None:
             self.long_label.set_label("")
@@ -188,18 +206,22 @@ class MathCell(Cell):
     def on_calculate(self, widget, _ = None):
         self.computation = True
         self.revealer.set_reveal_child(True)
+        self.set_button_clear()
         self.emit("calculate")
 
-    def clear(self, widget, _):
+    def clear(self, widget, _ = None):
         self.computation = False
         self.revealer.set_reveal_child(False)
         self.update_result(None)
+        self.set_button_calculate()
         self.emit("calculate")
 
     def on_focus_enter(self, widget, _ = None):
+        self.calculate_button_revealer.set_reveal_child(True)
         if self.computation:
             self.revealer.set_reveal_child(True)
     def on_focus_leave(self, widget, _ = None):
+        self.calculate_button_revealer.set_reveal_child(False)
         if self.computation:
             self.revealer.set_reveal_child(False)
             self.emit("calculate")
@@ -222,6 +244,7 @@ class TextCell(Cell):
         # TODO load files
 
         self.editor.connect("backspace", self.on_backspace)
+        self.editor.connect("move-cursor", self.on_move_cursor)
         self.buffer = self.editor.get_buffer()
         self.buffer.connect("changed", self.on_edit)
 
@@ -245,6 +268,9 @@ class TextCell(Cell):
     def on_backspace(self, widget, _ = None):
         if self.buffer.get_char_count() == 0:
             self.remove()
+
+    def on_move_cursor(self, textview, step, count, extend_selection):
+        pass
 
     def get_editor(self):
         return self.editor

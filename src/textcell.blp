@@ -2,12 +2,12 @@ using Gtk 4.0;
 using Adw 1;
 
 template $TextCell : $Cell {
-  Gtk.Box {
-    orientation: horizontal;
-    Gtk.Image {
-      icon-name: "list-drag-handle-symbolic";
-      opacity: 0.5;
-    }
+  // Gtk.Box {
+    // orientation: horizontal;
+    // Gtk.Image {
+    //   icon-name: "list-drag-handle-symbolic";
+    //   opacity: 0.5;
+    // }
       TextView textview {
         styles ["textbox"]
         hexpand: true;
@@ -23,5 +23,5 @@ template $TextCell : $Cell {
         cursor-visible: true;
         wrap-mode: word;
       }
-  }
+  // }
 }

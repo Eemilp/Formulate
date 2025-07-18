@@ -44,8 +44,6 @@ class Document(Adw.Bin):
     file = None
     edited = False
 
-    recompute = False
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -138,8 +136,6 @@ class Document(Adw.Bin):
 
     def on_edit(self, widget = None):
         self.edited = True
-        if widget.get_type() == CellType.COMPUTATION:
-            self.recompute = True
 
     def run_calculation(self, _widget = None):
         cells = [c for c in self.cells][:-1] #Due to last element being status page
@@ -155,9 +151,6 @@ class Document(Adw.Bin):
         task = Gio.Task.new(self, None, self.run_calculation_complete, None)
         task.expressions = expressions # Pass expressions onto bg task
         task.computed_cells = computed_cells
-
-        # Mark recompute false
-        self.recompute = False
 
         # Launch calculation
         task.run_in_thread(self.run_calculation_background)

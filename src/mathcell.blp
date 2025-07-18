@@ -2,20 +2,23 @@ using Gtk 4.0;
 using Adw 1;
 
 template $MathCell : $Cell {
-  Gtk.Box {
-    orientation: horizontal;
-    Gtk.Image {
-      icon-name: "list-drag-handle-symbolic";
-      opacity: 0.5;
-    }
 
   Gtk.Box {
     orientation: vertical;
     valign: center;
-    halign: center;
     hexpand: true;
 
-    Gtk.Box {
+  Gtk.CenterBox {
+    orientation: horizontal;
+    hexpand: true;
+    valign: center;
+
+    // start-widget: Gtk.Image {
+    //   icon-name: "list-drag-handle-symbolic";
+    //   opacity: 0.5;
+    // };
+
+    center-widget: Gtk.Box {
       orientation: horizontal;
       valign: center;
       halign: center;
@@ -27,7 +30,15 @@ template $MathCell : $Cell {
         label: "";
         use-markup: true;
       }
+    };
+
+    end-widget: Gtk.Revealer calculate_button_revealer {
+      Gtk.Button calculate_button {
+      }
+    };
+
     }
+
     Gtk.Revealer long_text_revealer {
       Gtk.Label long_text {
         label: "";
@@ -36,6 +47,5 @@ template $MathCell : $Cell {
         wrap-mode: word;
       }
     }
-  }
-  }
+}
 }
