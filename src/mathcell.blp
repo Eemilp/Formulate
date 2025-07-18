@@ -33,6 +33,8 @@ template $MathCell : $Cell {
     };
 
     end-widget: Gtk.Revealer calculate_button_revealer {
+      transition-type: crossfade;
+      transition-duration: 300;
       Gtk.Button calculate_button {
       }
     };
